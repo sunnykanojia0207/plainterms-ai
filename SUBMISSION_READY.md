@@ -6,7 +6,7 @@
 ## Links
 
 - Repository URL: https://github.com/sunnykanojia0207/plainterms-ai (pushed 2026-09-14, branch `main`)
-- Vercel URL: PENDING (not deployed; assessment in ARCHITECTURE.md)
+- Vercel URL: https://plainterms-ai.vercel.app/ (live 2026-09-14, serving current `main`: redesign UI + static error copy verified by screenshot/probe)
 - Branch: `main` (only branch)
 
 ## Facts
@@ -57,9 +57,14 @@ statuses. Axe gates green. Manual screen-reader pass: PENDING.
 
 ## Live Gemini status
 
-PENDING — LIVE GEMINI VERIFICATION (see LIVE_GEMINI_VERIFICATION.md).
-To complete: set `GEMINI_API_KEY` in `.env.local`, restart dev, work
-§19's table, record results + latencies in §14.
+QUOTA-BLOCKED 2026-09-14 (see LIVE_GEMINI_VERIFICATION.md §20): the key
+authenticates but the provider returns 429 RESOURCE_EXHAUSTED on every call
+(verified twice + trivial probe; local and prod agree). Generation checks
+are FAILED-blocked (not code failures). LIVE VERIFIED instead: honest
+static error UI with zero leaks (exact 502 body recorded), key validity
+(429 not 401), bounded retries (~3.1s), no console/hydration issues.
+Remediation: refill quota (or fresh key in Vercel Production + local
+`.env`; redeploy if the Vercel variable changed), then rerun §19.
 
 ## Rate limiting status
 
@@ -91,8 +96,8 @@ limitations, live-demo/GitHub placeholders, 11 v2 screenshots (fresh set).
 - [x] All quality gates green at release commit
 - [x] Demo path works keyless (seeded V1/V2); AI live with key
 - [x] Push to public GitHub remote (done 2026-09-14: sunnykanojia0207/plainterms-ai, branch `main`)
-- [ ] Vercel production deploy + smoke test (needs Vercel auth)
-- [ ] Live-model verification (needs key)
+- [x] Vercel production live + smoke-tested (serves current `main`; key present — see quota note below)
+- [ ] Live-model verification (BLOCKED: provider quota exhausted — see Live Gemini status)
 
 ## To finish submission (owner actions)
 

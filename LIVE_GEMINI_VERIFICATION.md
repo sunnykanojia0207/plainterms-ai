@@ -1,19 +1,30 @@
 # LIVE_GEMINI_VERIFICATION.md
 
 > **Milestone:** Prompt 10 — first live-model verification and hardening.
-> **API key status at verification time: NO `GEMINI_API_KEY` PRESENT.**
-> No key exists in the environment, in `.env.local` (absent), in any file, or
-> anywhere in this workspace. Every live-model check below therefore reports
-> one of two honest states. Nothing in this document claims a live result
-> that was not observed against the real provider.
+> **Live run 2026-09-14 (this session): QUOTA-BLOCKED — see §20.**
+> A real key exists and authenticates, but the provider returns HTTP 429
+> RESOURCE_EXHAUSTED on every call (verified twice, minutes apart, including
+> a trivial probe). No successful generation was possible; every
+> generation-dependent check below is marked FAILED (blocked by quota) with
+> evidence. The live ERROR path, however, is fully exercised and
+> LIVE VERIFIED (static honest UI, zero leaks).
+>
+> Historical note: at the original verification time there was NO
+> `GEMINI_API_KEY` present. Every live-model check then reported one of two
+> honest states. Nothing in this document claims a live result that was not
+> observed against the real provider.
 
 - **LIVE GEMINI VERIFIED** — observed against `gemini-2.5-flash` with a real key.
 - **MOCK VERIFIED** — proven with a mocked provider + real application code
   (schemas, validators, orchestrators, UI). Deterministic and repeatable.
 - **LIVE PENDING** — requires a key; exact manual steps are given in §19.
+- **FAILED (blocked by quota)** — attempted live 2026-09-14; provider
+  returned 429 on all calls. Not a code failure; rerun after quota refill.
 
-**Scoreboard: 0 of 12 live tests executed live (no key). All 12 are
-mock-verified or statically verified below, with keyed reproduction steps.**
+**Scoreboard: 0 of 12 generation tests successful live (provider quota
+exhausted). Error-path, security, and no-leak behavior are LIVE VERIFIED
+below. All 12 generation paths remain mock-verified, with keyed
+reproduction steps.**
 
 ---
 
@@ -30,9 +41,13 @@ mock-verified or statically verified below, with keyed reproduction steps.**
 
 ## 2. Environment Verification
 
-- **STATICALLY VERIFIED:**
-  - `.gitignore` ignores `.env*`; the repo is not a git repo, and no
-    `.env.local`/`.env` file exists in the workspace.
+- **STATICALLY VERIFIED (updated 2026-09-14):**
+  - `.gitignore` ignores `.env*`; local `.env`/`.env.local` exist but are
+    untracked and uncommitted (verified: `git status` clean of secrets,
+    secret scan empty). The repo is public at
+    `sunnykanojia0207/plainterms-ai` with no secrets in history for this
+    verification (only key-length presence checks were run; values never
+    printed, logged, or committed).
   - `GEMINI_API_KEY` is referenced in exactly two files, both server-only:
     `lib/security/env.ts` (`server-only` guarded) and
     `lib/ai/gemini-client.ts` (`server-only`). Zero references in
@@ -126,6 +141,9 @@ mock-verified or statically verified below, with keyed reproduction steps.**
   document/context) covered in component and e2e tests against HTTP-shaped
   failures (500/503/unknown-fixture/bad-request).
 - **LIVE PENDING:** throttle/revoke Key scenarios per §19 step 10.
+- **LIVE VERIFIED (error path, 2026-09-14):** real provider 429s on prod
+  and keyed local produce the static honest states with retry preserved
+  (see §20 rows 3, 4, 10) — the exact scenario the mocks simulate.
 
 ## 12. Cache Results
 
@@ -144,11 +162,17 @@ mock-verified or statically verified below, with keyed reproduction steps.**
 
 ## 14. Performance Measurements
 
-- No live latencies were observed (no key); none are reported or estimated.
-- How to record them (keyed run): server logs emit `latencyMs` per
-  request; time-to-validated-response ≈ log latency; time-to-first-useful-UI
-  via devtools on Review/Compare/Ask; cache-hit latency by re-running;
-  retry latency by throttling. Record the observed numbers in §19's table.
+- No successful live generation was observed (provider quota exhausted);
+  no time-to-answer numbers are reported or estimated.
+- **LIVE VERIFIED (error path, 2026-09-14):** keyed local `/api/ask` fails
+  bounded in ~3.1s (initial + 2 retries, then static error); keyed prod
+  Ask surfaces the honest error card with zero raw leakage (see §20).
+  These are the only live latencies observed.
+- How to record generation latencies (keyed run after refill): server logs
+  emit `latencyMs` per request; time-to-validated-response ≈ log latency;
+  time-to-first-useful-UI via devtools on Review/Compare/Ask; cache-hit
+  latency by re-running; retry latency by throttling. Record the observed
+  numbers in §19's table.
 
 ## 15. Security Findings
 
@@ -183,11 +207,15 @@ mock-verified or statically verified below, with keyed reproduction steps.**
 
 ## 18. Remaining Limitations
 
-- **No live verification performed** — the single blocking limitation.
-- Automated failure simulation cannot prove provider-side behavior
+- **Provider quota exhausted (blocking, 2026-09-14).** The configured key
+  authenticates (429, not 401/403) but every call — including a trivial
+  probe — returns RESOURCE_EXHAUSTED. All generation checks (§3–§9 live
+  halves, §10 live re-audit, §12–§13 live halves) are blocked until refill.
+  Automated failure simulation cannot prove provider-side behavior
   (safety blocks, real latency distributions, model wording quality).
 - Banned-phrase UI audit is static; live responses need the §10 re-audit.
-- Performance section is unpopulated pending a keyed run.
+- `vercel login` was unavailable in this environment, so Production env
+  scope and redeploy could not be performed from CLI (see §20).
 
 ## 19. Exact Manual Verification Steps
 
@@ -212,6 +240,33 @@ test is `gemini-2.5-flash`; confirm via the server log `model` field.
 
 Record results here on completion: _not yet executed — no key at verification time
 (reconfirmed 2026-09-14: no key in env, no .env.local, no remote, no Vercel auth)._
+
+## 20. Live run 2026-09-14 — quota-blocked (production + keyed local)
+
+> Production: https://plainterms-ai.vercel.app/ (200, serving the current
+> redesign — verified by screenshot: 01/02/03 workflow, hero split).
+> No secrets are recorded here; only statuses, timings, and UI copy.
+
+| #   | Check                                             | Result                                                                                                                                                                                                                                                                                   |
+| --- | ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Local env                                         | Key present in ignored local `.env` (length verified, value never printed); `.env.local` is template-only; `.env*` git-ignored; nothing committed.                                                                                                                                       |
+| 2   | Vercel env                                        | Indirectly verified PRESENT (prod attempts provider calls → 502 error path, never 503 unavailable). Production scope + redeploy BLOCKED: no `vercel login` credentials in this environment. Prod demonstrably serves current `main` (redesign UI + new static error copy observed live). |
+| 3   | Review analysis (V1 sample, prod)                 | FAILED (blocked by quota): “The review didn't complete / The AI request didn't complete. Your document is untouched.” with Retry; document fully readable; zero page errors.                                                                                                             |
+| 4   | Ask ×7 (prod)                                     | FAILED (blocked by quota): “What are the payment terms?” → “The answer didn't come back” error card, zero answers, zero evidence, zero console errors. Remaining 6 questions not burned against an exhausted quota (no result possible either way).                                      |
+| 5   | Compare V1/V2 (prod)                              | Not executed (quota; no successful call possible). Mock coverage stands.                                                                                                                                                                                                                 |
+| 6   | Action Pack / Review Guide (prod)                 | Not executed (quota). Mock coverage stands.                                                                                                                                                                                                                                              |
+| 7   | Real uploads + injection fixture                  | Not executed live (quota). Upload/parse paths covered by keyless e2e (29/29).                                                                                                                                                                                                            |
+| 8   | Error-UI leak audit (prod, live)                  | LIVE VERIFIED: 502 body is exactly `{"code":"ai-error","message":"The AI request didn't complete. Your document is untouched."}` — no `requestId`, no 429, no URLs. Rendered HTML contains no `AIza`/provider host; local/session storage keys empty.                                    |
+| 9   | Key validity                                      | LIVE VERIFIED: provider returns 429 (authenticated-but-exhausted), not 401/403 — the key is recognized.                                                                                                                                                                                  |
+| 10  | Retry boundedness                                 | LIVE VERIFIED: keyed local ask fails in ~3.1s (bounded retries, then static error); no retry storms in logs.                                                                                                                                                                             |
+| 11  | Unavailable path                                  | Code-verified (cannot trigger live while a key is configured); keyless e2e covers it (29/29). Live revoke test skipped (would disturb the shared prod env).                                                                                                                              |
+| 12  | Console/hydration/overflow (prod Home/Review/Ask) | No page errors, no console errors; overflow sweep 25/25 zero on the same tree (separate run).                                                                                                                                                                                            |
+
+**Remediation (single item):** refill or raise quota (or set a fresh
+`GEMINI_API_KEY` in Vercel Production + local `.env`), then rerun §19 steps
+1–9. If the variable changed on Vercel, redeploy (`vercel --prod`) first.
+No code changes are indicated — every observed failure is quota, and every
+failure surface behaved exactly as designed.
 
 ---
 
