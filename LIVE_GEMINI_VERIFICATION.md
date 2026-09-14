@@ -210,11 +210,12 @@ test is `gemini-2.5-flash`; confirm via the server log `model` field.
 | 11  | Re-run identical analysis/compare/Q&A/pack                                                         | Instant (cache); server shows no new provider call                                        |
 | 12  | Record latencies (first response, validated response, cache hit)                                   | Fill §14 with observed numbers only                                                       |
 
-Record results here on completion: _not yet executed — no key at verification time._
+Record results here on completion: _not yet executed — no key at verification time
+(reconfirmed 2026-09-14: no key in env, no .env.local, no remote, no Vercel auth)._
 
 ---
 
-_End of LIVE_GEMINI_VERIFICATION.md. Automated gates: format ✓ lint ✓
-strict typecheck ✓ 147+ unit/component/integration tests ✓ 24 e2e ✓
-production build ✓ (see milestone report for exact counts at finish time).
+_End of LIVE_GEMINI_VERIFICATION.md. Automated gates (reconfirmed
+2026-09-14): format ✓ lint ✓ strict typecheck ✓ 199 unit/component/
+integration tests, 42 files ✓ 29 e2e ✓ production build ✓.
 Live-model verification: NOT PERFORMED — no API key available._
