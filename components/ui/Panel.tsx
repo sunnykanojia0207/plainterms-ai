@@ -13,9 +13,7 @@ export function Panel({ title, actions, children, className }: PanelProps) {
   return (
     <section aria-label={title} className={cn("flex flex-col gap-3", className)}>
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
-          {title}
-        </h2>
+        <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">{title}</h2>
         {actions}
       </div>
       <div className="flex flex-col gap-3">{children}</div>

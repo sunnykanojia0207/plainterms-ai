@@ -50,11 +50,11 @@ export function TopNav() {
       >
         Skip to main content
       </a>
-      <header className="sticky top-0 z-30 border-b border-border bg-bg/95 backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-6xl items-center gap-2 px-4 sm:px-6">
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 backdrop-blur">
+        <div className="mx-auto flex h-14 max-w-[1440px] items-center gap-2 px-4 sm:px-6 lg:px-8">
           <button
             type="button"
-            className="inline-flex size-11 items-center justify-center rounded-md text-text-secondary hover:bg-neutral-bg lg:hidden"
+            className="inline-flex size-11 items-center justify-center rounded-md text-secondary hover:bg-surface-muted lg:hidden"
             aria-label="Open navigation menu"
             aria-expanded={mobileOpen}
             onClick={() => setMobileOpen(true)}
@@ -70,7 +70,7 @@ export function TopNav() {
             >
               P
             </span>
-            <span className="text-lg font-semibold tracking-tight">PlainTerms</span>
+            <span className="text-[15px] font-semibold tracking-tight">PlainTerms</span>
           </Link>
           <nav aria-label="Primary" className="ml-6 hidden items-center gap-1 lg:flex">
             {NAV_ITEMS.map((item) => (
@@ -79,10 +79,10 @@ export function TopNav() {
                 href={item.href}
                 aria-current={isActive(pathname, item.href) ? "page" : undefined}
                 className={cn(
-                  "rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                  "rounded-md px-3 py-2 text-sm transition-colors duration-micro",
                   isActive(pathname, item.href)
-                    ? "text-accent underline underline-offset-4"
-                    : "text-text-secondary hover:bg-neutral-bg hover:text-text-primary",
+                    ? "bg-accent-muted font-semibold text-accent shadow-[inset_0_-2px_0_var(--accent)]"
+                    : "font-medium text-secondary hover:bg-surface-muted hover:text-primary",
                 )}
               >
                 {item.label}
@@ -93,12 +93,22 @@ export function TopNav() {
             <button
               type="button"
               onClick={() => setMenuOpen(true)}
-              className="hidden h-10 items-center gap-2 rounded-md border border-border bg-surface px-3 text-sm text-text-secondary hover:text-text-primary sm:inline-flex"
+              aria-label="Open command menu"
+              className="inline-flex size-11 items-center justify-center rounded-md text-secondary hover:bg-surface-muted sm:hidden"
+            >
+              <span aria-hidden="true" className="text-lg">
+                ⌕
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setMenuOpen(true)}
+              className="hidden h-9 items-center gap-2 rounded-md border border-border bg-surface px-3 text-sm text-secondary hover:text-primary sm:inline-flex"
               aria-label="Open command menu"
             >
               <span aria-hidden="true">⌕</span>
               <span>Search or jump to…</span>
-              <kbd className="rounded border border-border bg-neutral-bg px-1.5 font-evidence text-xs">
+              <kbd className="rounded border border-border bg-surface-muted px-1.5 font-evidence text-xs">
                 Ctrl K
               </kbd>
             </button>
@@ -122,8 +132,8 @@ export function TopNav() {
               className={cn(
                 "rounded-md px-3 py-3 text-base font-medium",
                 isActive(pathname, item.href)
-                  ? "bg-accent/10 text-accent"
-                  : "text-text-primary hover:bg-neutral-bg",
+                  ? "bg-accent-muted text-accent"
+                  : "text-primary hover:bg-surface-muted",
               )}
             >
               {item.label}

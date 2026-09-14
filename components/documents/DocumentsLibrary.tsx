@@ -1,5 +1,6 @@
 "use client";
 
+import type { ReactNode } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -55,11 +56,26 @@ function openTarget(document: StoredDocument): string {
 
 export function DocumentRow({ document }: { readonly document: StoredDocument }) {
   const { notify } = useToast();
+  const updated = new Date(document.updatedAt).toLocaleDateString(undefined, {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  });
   return (
-    <li className="flex flex-wrap items-center gap-3 rounded-lg border border-border bg-surface p-4">
+    <li className="flex flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 transition-colors duration-micro hover:bg-surface-muted">
+      <span
+        aria-hidden="true"
+        className="hidden size-9 shrink-0 items-center justify-center rounded-md bg-surface-muted font-doc text-lg text-secondary sm:inline-flex"
+      >
+        §
+      </span>
       <div className="flex min-w-0 flex-1 flex-col gap-1">
-        <p className="truncate text-base font-semibold">{document.title}</p>
-        <div className="flex flex-wrap items-center gap-2">
+        <p className="text-[15px] font-semibold sm:truncate">{document.title}</p>
+        <p className="truncate text-xs text-tertiary tabular-nums" suppressHydrationWarning>
+          v{document.currentVersion} · {document.pageCount}{" "}
+          {document.pageCount === 1 ? "page" : "pages"} · Updated {updated}
+        </p>
+        <div className="flex flex-wrap items-center gap-1.5">
           <Badge tone="accent">{DOCUMENT_TYPE_LABELS[document.type]}</Badge>
           <Badge tone={statusTone(document.status)}>{statusLabel(document.status)}</Badge>
           {document.isSample ? <Badge tone="neutral">Sample</Badge> : null}
@@ -92,11 +108,11 @@ export function DocumentsLibrary() {
   const documents = useDocuments();
   const ordered = [...documents].reverse();
 
-  const list = (items: readonly StoredDocument[], empty: string) =>
+  const list = (items: readonly StoredDocument[], empty: string, action?: ReactNode) =>
     items.length === 0 ? (
-      <EmptyState title="Nothing here yet" description={empty} />
+      <EmptyState title="Nothing here yet" description={empty} action={action} />
     ) : (
-      <ul className="flex flex-col gap-3">
+      <ul className="flex flex-col divide-y divide-border overflow-hidden rounded-lg border border-border bg-surface">
         {items.map((document) => (
           <DocumentRow key={document.id} document={document} />
         ))}
@@ -113,6 +129,9 @@ export function DocumentsLibrary() {
           content: list(
             ordered,
             "Upload a client contract to start your library. Service Agreements, NDAs, and Statements of Work are supported.",
+            <Button size="sm" href="/#home-upload">
+              Upload a document
+            </Button>,
           ),
         },
         {
@@ -123,6 +142,9 @@ export function DocumentsLibrary() {
               (document) => document.status === "reviewing" || document.status === "processing",
             ),
             "Documents being prepared or reviewed will appear here.",
+            <Button size="sm" href="/#home-upload">
+              Upload a document
+            </Button>,
           ),
         },
         {
@@ -131,6 +153,9 @@ export function DocumentsLibrary() {
           content: list(
             ordered.filter((document) => document.status === "comparison-ready"),
             "When you compare two versions of a contract, the pair will be listed here.",
+            <Button size="sm" href="/compare">
+              Compare versions
+            </Button>,
           ),
         },
         {

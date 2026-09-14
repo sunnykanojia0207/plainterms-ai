@@ -86,14 +86,12 @@ export function ReadyView({ documentId }: ReadyViewProps) {
       </div>
 
       <Card>
-        <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
-          Preview
-        </h2>
+        <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">Preview</h2>
         <Text className="mt-2">{first?.paragraphs[0] ?? ""}</Text>
         <Text className="mt-2" tone="secondary">
           {payment?.paragraphs[0] ?? ""}
         </Text>
-        <p className="mt-3 text-xs text-text-secondary">
+        <p className="mt-3 text-xs text-secondary">
           {document.isSample
             ? "Demo preview from sample content — legal interpretation arrives with the analysis milestone."
             : "Preview of your uploaded document — legal interpretation arrives with the analysis milestone."}
@@ -101,7 +99,7 @@ export function ReadyView({ documentId }: ReadyViewProps) {
       </Card>
 
       <Card>
-        <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+        <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">
           Areas worth reviewing
         </h2>
         <Text tone="secondary" className="mt-2 text-sm">

@@ -21,7 +21,7 @@ export function Tooltip({ label, children }: TooltipProps) {
       <span
         role="tooltip"
         id={tooltipId}
-        className="pointer-events-none absolute bottom-full left-1/2 z-70 mb-2 hidden -translate-x-1/2 rounded-md bg-text-primary px-2 py-1 text-xs whitespace-nowrap text-bg group-hover/tooltip:block group-focus-within/tooltip:block"
+        className="pointer-events-none absolute bottom-full left-1/2 z-70 mb-2 hidden -translate-x-1/2 rounded-md bg-primary px-2 py-1 text-xs whitespace-nowrap text-background group-hover/tooltip:block group-focus-within/tooltip:block"
       >
         {label}
       </span>

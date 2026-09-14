@@ -12,17 +12,18 @@ export const metadata: Metadata = {
 /** Documents library: real store-backed groups and row actions. */
 export default function DocumentsPage() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div className="flex flex-col gap-1">
+    <div className="mx-auto flex w-full flex-col gap-5">
+      <div className="flex flex-wrap items-end justify-between gap-3 border-b border-border pb-4">
+        <div className="flex min-w-0 flex-col gap-1">
+          <p className="font-evidence text-xs font-semibold tracking-widest text-tertiary uppercase">
+            Library
+          </p>
           <Heading level={1}>Documents</Heading>
-          <Text tone="secondary">
-            Your contracts live here — recent, in review, compared, archived.
+          <Text tone="secondary" className="text-sm">
+            Recent, in review, compared, archived.
           </Text>
         </div>
-        <Button variant="secondary" href="/">
-          Upload a document
-        </Button>
+        <Button href="/#home-upload">Upload a document</Button>
       </div>
       <LibraryHint />
       <DocumentsLibrary />

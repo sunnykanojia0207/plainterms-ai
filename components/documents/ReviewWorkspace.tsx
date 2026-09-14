@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { Heading } from "@/components/ui/Heading";
+import { Drawer } from "@/components/ui/Drawer";
 import { FeatureErrorBoundary } from "@/components/errors/error-boundary";
 import { DocumentOutline } from "@/components/documents/DocumentOutline";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
@@ -28,6 +29,7 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
   const document = useDocument(documentId);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [outlineOpen, setOutlineOpen] = useState(false);
 
   function selectSection(sectionId: string): void {
     setActiveId(sectionId);
@@ -61,20 +63,32 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
 
   return (
     <FeatureErrorBoundary scope="review-workspace">
-      <div className="flex flex-col gap-4">
-        <div className="flex flex-wrap items-center gap-2 border-b border-border pb-4">
-          <div className="flex min-w-0 flex-1 flex-col gap-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <Heading level={1}>{document.title}</Heading>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
+      <div className="mx-auto flex w-full max-w-[1400px] flex-col gap-4">
+        <div className="sticky top-14 z-20 -mx-4 flex min-h-12 flex-wrap items-center gap-2 border-b border-border bg-background/95 px-4 py-2 backdrop-blur sm:-mx-6 sm:px-6">
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+            <Heading level={1} className="truncate">
+              {document.title}
+            </Heading>
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
               <Badge tone="accent">{DOCUMENT_TYPE_LABELS[document.type]}</Badge>
               <Badge tone="neutral">
                 {document.pageCount} {document.pageCount === 1 ? "page" : "pages"}
               </Badge>
+              <span className="font-evidence text-xs text-tertiary tabular-nums">
+                v{document.currentVersion}
+              </span>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex min-w-0 flex-wrap items-center gap-2">
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setOutlineOpen(true)}
+              aria-label="Open document sections"
+              className="lg:hidden"
+            >
+              Sections
+            </Button>
             <Button
               variant="secondary"
               size="sm"
@@ -87,7 +101,7 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
             >
               ← Previous
             </Button>
-            <span aria-live="polite" className="text-sm text-text-secondary">
+            <span aria-live="polite" className="text-sm text-secondary">
               Section {currentIndex + 1} of {sections.length}
             </span>
             <Button
@@ -111,25 +125,32 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
           </div>
         </div>
 
-        <div className="grid gap-4 lg:grid-cols-[15%_1fr_28%]">
-          <div className="hidden rounded-lg border border-border bg-surface p-4 lg:block">
-            <DocumentOutline sections={sections} activeId={currentId} onSelect={selectSection} />
+        <div className="grid gap-6 md:grid-cols-[minmax(0,1fr)_20rem] lg:grid-cols-[15rem_minmax(0,1fr)_23.75rem]">
+          <div className="hidden border-r border-border pr-4 lg:block">
+            <div className="sticky top-32">
+              <DocumentOutline sections={sections} activeId={currentId} onSelect={selectSection} />
+            </div>
           </div>
 
           <section
             aria-label="Document viewer"
-            className="rounded-lg border border-border bg-surface p-6 sm:p-10"
+            className="min-w-0 rounded-lg border border-border bg-surface p-6 shadow-sm sm:p-10"
           >
             <DocumentViewer sections={sections} activeId={currentId} onActiveChange={setActiveId} />
           </section>
 
           <aside
             aria-label="PlainTerms intelligence panel"
-            className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-4"
+            className="flex min-w-0 flex-col gap-4 border-t border-border bg-background pt-4 md:border-t-0 md:border-l md:pt-0 md:pl-4"
           >
-            <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
-              Intelligence
-            </h2>
+            <div className="flex flex-col gap-0.5">
+              <h2 className="text-sm font-semibold tracking-widest text-secondary uppercase">
+                PlainTerms review
+              </h2>
+              <p className="text-xs text-tertiary">
+                AI-assisted understanding — every claim cites its source.
+              </p>
+            </div>
             <IntelligencePanel
               documentId={document.id}
               fixtureId={document.fixtureId}
@@ -146,10 +167,10 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
                 Compare versions
               </Button>
             </div>
-            <p className="text-xs text-text-secondary">
+            <p className="text-xs text-secondary">
               In-document search arrives with document intelligence.
             </p>
-            <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+            <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">
               Action Pack
             </h2>
             <ActionPackPanel
@@ -159,7 +180,7 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
               version={document.currentVersion}
               onSelectSection={selectSection}
             />
-            <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+            <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">
               Review Guide
             </h2>
             <ReviewGuidePanel
@@ -172,6 +193,17 @@ export function ReviewWorkspace({ documentId }: ReviewWorkspaceProps) {
           </aside>
         </div>
       </div>
+
+      <Drawer open={outlineOpen} onClose={() => setOutlineOpen(false)} title="Sections" side="left">
+        <DocumentOutline
+          sections={sections}
+          activeId={currentId}
+          onSelect={(sectionId) => {
+            selectSection(sectionId);
+            setOutlineOpen(false);
+          }}
+        />
+      </Drawer>
     </FeatureErrorBoundary>
   );
 }

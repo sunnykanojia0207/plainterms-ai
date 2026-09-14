@@ -132,7 +132,7 @@ export function UploadFlow({ onUploaded, compact = false }: UploadFlowProps) {
         <div className="flex items-start justify-between gap-3">
           <div className="flex min-w-0 flex-col">
             <p className="truncate text-base font-semibold">{selection.title}</p>
-            <p className="text-sm text-text-secondary">
+            <p className="text-sm text-secondary">
               {selection.fileName} · {formatSize(selection.sizeBytes)}
             </p>
           </div>
@@ -145,7 +145,7 @@ export function UploadFlow({ onUploaded, compact = false }: UploadFlowProps) {
             Remove
           </Button>
         </div>
-        <p aria-live="polite" className="text-sm text-text-secondary">
+        <p aria-live="polite" className="text-sm text-secondary">
           {uploading ? "Uploading and preparing your document…" : "Ready when you are."}
         </p>
         <div className="flex flex-wrap gap-2">
@@ -172,7 +172,7 @@ export function UploadFlow({ onUploaded, compact = false }: UploadFlowProps) {
       {state.kind === "invalid" ? (
         <div
           role="alert"
-          className="flex flex-col gap-2 rounded-lg border border-critical/40 bg-critical-bg px-4 py-3"
+          className="flex flex-col gap-2 rounded-lg border border-l-4 border-critical bg-critical-muted px-4 py-3"
         >
           <p className="text-sm font-semibold text-critical">That file can&apos;t be reviewed</p>
           <ul className="flex list-disc flex-col gap-1 pl-5 text-sm">
@@ -180,7 +180,7 @@ export function UploadFlow({ onUploaded, compact = false }: UploadFlowProps) {
               <li key={issue}>{issue}</li>
             ))}
           </ul>
-          <p className="text-sm text-text-secondary">
+          <p className="text-sm text-secondary">
             Choose a PDF, DOCX, or TXT file up to 25 MB, then try again.
           </p>
         </div>
@@ -188,7 +188,7 @@ export function UploadFlow({ onUploaded, compact = false }: UploadFlowProps) {
       {state.kind === "failed" ? (
         <div
           role="alert"
-          className="flex flex-col gap-2 rounded-lg border border-critical/40 bg-critical-bg px-4 py-3"
+          className="flex flex-col gap-2 rounded-lg border border-l-4 border-critical bg-critical-muted px-4 py-3"
         >
           <p className="text-sm font-semibold text-critical">The upload didn&apos;t complete</p>
           <p className="text-sm">{state.message}</p>

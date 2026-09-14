@@ -80,7 +80,7 @@ export function Dialog({ open, onClose, title, description, children, className 
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-0 sm:items-center sm:p-6"
+      className="fixed inset-0 z-50 flex items-end justify-center bg-overlay p-0 sm:items-center sm:p-6"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -95,7 +95,7 @@ export function Dialog({ open, onClose, title, description, children, className 
         aria-describedby={description === undefined ? undefined : descriptionId}
         tabIndex={-1}
         className={cn(
-          "max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-lg bg-surface-elevated p-6 shadow-md sm:rounded-lg",
+          "max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-t-lg bg-surface-raised p-6 shadow-md sm:rounded-lg",
           className,
         )}
       >
@@ -103,7 +103,7 @@ export function Dialog({ open, onClose, title, description, children, className 
           {title}
         </h2>
         {description === undefined ? null : (
-          <p id={descriptionId} className="mt-1 text-sm text-text-secondary">
+          <p id={descriptionId} className="mt-1 text-sm text-secondary">
             {description}
           </p>
         )}

@@ -179,6 +179,13 @@ command menu, drawers, dialogs, pagination, jumps, follow-ups, history.
 
 ---
 
+## 15. Redesign pass (2026-09-14) — QA run executed, fixes landed
+
+- The earlier "class-only, no token changes" note above is superseded: the landed redesign renamed tokens (`--bg`→`--background`, `--ai`→`--ai-accent`, `--*-bg`→`--*-muted`), added a full `.dark` set, radii 6/12/22, durations 120/220/300ms, `var(--focus)` outlines, and new `Surface`/`AIInsight`/`EvidenceReference`/`ReviewSection` primitives. Full per-screen evidence and pending gates are in UI_REDESIGN_AUDIT.md (22 sections); spec §§19–21/23/25 amended to match `app/globals.css`.
+- QA 2026-09-14 (keyless): format/lint/typecheck/build green; Vitest 198/199 (one cold-start flake, passes isolated — not a regression); Playwright 29/29 incl. axe gates green; overflow sweep 20/20 after fixing 2 redesign regressions (Compare pickers at 768px via `Select` `min-w-0`/`w-full`; Review pager at 375px via `flex-wrap`). Still pending: true dark screenshot (`redesign-home-dark.png` is mislabeled light content), per-screen dark check, manual SR pass, live-model verification.
+
+---
+
 _End of FINAL_QUALITY_AUDIT.md. Statuses: 3 issues FIXED with regression
 tests; walkthrough/responsive/console/dead-UI VERIFIED by execution;
 live-model items PENDING for lack of key. No features added, no tests

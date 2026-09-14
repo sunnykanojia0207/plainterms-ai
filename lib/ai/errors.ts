@@ -32,16 +32,19 @@ export class AITimeoutError extends AIError {
 
 /** Network/5xx/rate-limit/safety-block. Retryable within bounds. */
 export class AITransientError extends AIError {
-  constructor(requestId: string, detail: string) {
-    super("transient", requestId, `The AI request failed: ${detail}`);
+  constructor(requestId: string) {
+    // User-facing message is static by construction: provider detail
+    // (codes, URLs, request IDs) must never reach API responses or UI.
+    super("transient", requestId, "The AI request didn't complete. Your document is untouched.");
     this.name = "AITransientError";
   }
 }
 
 /** Output failed schema validation (including after repair). Not retried further. */
 export class AIValidationError extends AIError {
-  constructor(requestId: string, issues: string) {
-    super("validation", requestId, `The AI response failed validation: ${issues}`);
+  constructor(requestId: string) {
+    // Static by construction: schema paths stay in server logs, not UI.
+    super("validation", requestId, "The AI response didn't pass validation. Nothing was lost.");
     this.name = "AIValidationError";
   }
 }

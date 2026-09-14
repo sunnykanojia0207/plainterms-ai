@@ -30,7 +30,7 @@ export function Search({
       <div className="relative flex-1">
         <span
           aria-hidden="true"
-          className="absolute top-1/2 left-3 -translate-y-1/2 text-text-secondary"
+          className="absolute top-1/2 left-3 -translate-y-1/2 text-secondary"
         >
           ⌕
         </span>
@@ -41,12 +41,12 @@ export function Search({
           placeholder={placeholder ?? "Search"}
           value={value}
           onChange={(event) => onChange(event.target.value)}
-          className="h-10 w-full rounded-md border border-border bg-surface pr-16 pl-9 text-sm placeholder:text-text-secondary"
+          className="h-11 w-full rounded-md border border-border bg-surface pr-16 pl-9 text-sm placeholder:text-secondary"
         />
         {matchCount === undefined ? null : (
           <span
             aria-live="polite"
-            className="absolute top-1/2 right-3 -translate-y-1/2 text-xs text-text-secondary"
+            className="absolute top-1/2 right-3 -translate-y-1/2 text-xs text-secondary"
           >
             {matchCount} {matchCount === 1 ? "match" : "matches"}
           </span>

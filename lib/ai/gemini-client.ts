@@ -115,7 +115,7 @@ export async function generateStructured<T>(
       ]);
       const text = response.text;
       if (typeof text !== "string" || text.trim() === "") {
-        throw new AITransientError(requestId, "The model returned no usable output.");
+        throw new AITransientError(requestId);
       }
       return text;
     } finally {
@@ -164,7 +164,13 @@ export async function generateStructured<T>(
           });
           return { data, requestId, repaired: true, latencyMs };
         } catch (repairError) {
-          throw new AIValidationError(requestId, summarizeIssues(repairError));
+          // Schema paths stay in server logs; the thrown error is static.
+          logger.warn("AI repair failed validation", {
+            ...baseLog,
+            status: "error",
+            validation: summarizeIssues(repairError).slice(0, 120),
+          });
+          throw new AIValidationError(requestId);
         }
       }
     } catch (error) {
@@ -196,8 +202,7 @@ export async function generateStructured<T>(
     throw lastError;
   }
   logger.warn("AI request failed", { ...baseLog, latencyMs, status: "error" });
-  throw new AITransientError(
-    requestId,
-    lastError instanceof Error ? lastError.message.slice(0, 160) : "Unknown error.",
-  );
+  // Raw provider detail stays out of the error: lastError content may hold
+  // codes, URLs, or provider IDs. It is already represented in retry logs.
+  throw new AITransientError(requestId);
 }

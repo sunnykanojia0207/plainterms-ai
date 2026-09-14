@@ -65,7 +65,7 @@ export function ToastProvider({ children }: { readonly children: ReactNode }) {
             role="status"
             className={cn(
               "pointer-events-auto flex items-center justify-between gap-3",
-              "rounded-lg border border-border bg-surface-elevated px-4 py-3 shadow-md",
+              "rounded-lg border border-border bg-surface-raised px-4 py-3 shadow-md",
             )}
           >
             <p className="text-sm">{toast.message}</p>
@@ -85,7 +85,7 @@ export function ToastProvider({ children }: { readonly children: ReactNode }) {
               <button
                 type="button"
                 aria-label="Dismiss notification"
-                className="text-sm text-text-secondary hover:text-text-primary"
+                className="text-sm text-secondary hover:text-primary"
                 onClick={() => dismiss(toast.id)}
               >
                 Dismiss

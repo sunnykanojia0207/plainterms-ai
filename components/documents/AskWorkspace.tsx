@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useId, useMemo, useState } from "react";
 import type { FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import { AnswerCard } from "@/components/documents/AnswerCard";
@@ -11,7 +11,6 @@ import { getSectionsForFixture } from "@/lib/documents/sections";
 import { useDocuments } from "@/lib/documents/store";
 import { Button } from "@/components/ui/Button";
 import { Heading } from "@/components/ui/Heading";
-import { Input } from "@/components/ui/Input";
 import { Select } from "@/components/ui/Select";
 import { AISkeleton } from "@/components/ui/Skeleton";
 import { Text } from "@/components/ui/Text";
@@ -51,8 +50,10 @@ export function AskWorkspace() {
   const [compareId, setCompareId] = useState<string | null>(null);
   const [sectionId, setSectionId] = useState<string | null>(() => searchParams.get("section"));
   const [draft, setDraft] = useState("");
+  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const [threads, setThreads] = useState<readonly ThreadEntry[]>([]);
   const [focusQuestion, setFocusQuestion] = useState<string | null>(null);
+  const composerId = useId();
 
   const selectedDoc = documents.find((doc) => doc.id === (docId ?? documents[0]?.id)) ?? null;
   const compareDoc =
@@ -93,12 +94,15 @@ export function AskWorkspace() {
       answerSummary: entry.response.answer.slice(0, 300),
     }));
     setDraft("");
+    setPendingQuestion(trimmed);
     // Recording happens here, in the submit event — never in an effect.
     const outcome = await ask(descriptors, trimmed, {
       sectionId,
       history: historyTurns,
     });
+    setPendingQuestion(null);
     if (outcome.status === "cancelled") {
+      setDraft(trimmed);
       return;
     }
     if (outcome.response !== null) {
@@ -120,6 +124,7 @@ export function AskWorkspace() {
       });
       setFocusQuestion(trimmed);
     } else {
+      setDraft(trimmed);
       addHistoryEntry({
         question: trimmed,
         timestamp: new Date().toISOString(),
@@ -150,207 +155,301 @@ export function AskWorkspace() {
     (entry) => selectedDoc !== null && entry.documentId === selectedDoc.id,
   );
 
+  const latest = threads.slice(-1)[0] ?? null;
+
   return (
-    <div className="mx-auto flex max-w-3xl flex-col gap-6">
+    <div className="mx-auto flex w-full max-w-none flex-col gap-6">
       <div className="flex flex-col gap-1">
+        <p className="font-evidence text-xs font-semibold tracking-widest text-tertiary uppercase">
+          Document Q&amp;A
+        </p>
         <Heading level={1}>Ask</Heading>
-        <Text tone="secondary">
+        <Text tone="secondary" className="text-sm">
           Ask what your document says. Every answer cites its evidence — or says honestly when it
           can&apos;t.
         </Text>
       </div>
 
-      <div
-        aria-label="Answer scope"
-        className="rounded-lg border border-dashed border-border bg-surface px-4 py-3"
-      >
-        <p className="text-sm text-text-secondary">
-          <span className="font-medium text-text-primary">Scope:</span>{" "}
-          {selectedDoc === null
-            ? "no document selected"
-            : `${selectedDoc.title}${compareDoc === null ? "" : ` + ${compareDoc.title}`}`}
-          {scopedSection === null ? "" : ` · in ${scopedSection.title}`} —{" "}
-          <span className="italic">
-            Don&apos;t just trust the AI. Verify it against the document.
-          </span>
-        </p>
-      </div>
+      <div className="grid items-start gap-8 lg:grid-cols-[17rem_minmax(0,1fr)] xl:grid-cols-[17rem_minmax(0,1fr)_20rem]">
+        <aside aria-label="Question context" className="order-2 flex flex-col gap-5 lg:order-1">
+          <div
+            aria-label="Answer scope"
+            className="rounded-lg border border-dashed border-border bg-surface px-4 py-3"
+          >
+            <p className="text-sm text-secondary">
+              <span className="font-medium text-primary">Scope:</span>{" "}
+              {selectedDoc === null
+                ? "no document selected"
+                : `${selectedDoc.title}${compareDoc === null ? "" : ` + ${compareDoc.title}`}`}
+              {scopedSection === null ? "" : ` · in ${scopedSection.title}`}
+            </p>
+            <p className="mt-1 text-xs text-tertiary italic">
+              Don&apos;t just trust the AI. Verify it against the document.
+            </p>
+          </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Select
-          label="Document"
-          value={selectedDoc?.id ?? ""}
-          onChange={(event) => {
-            setDocId(event.target.value || null);
-            setSectionId(null);
-          }}
-          options={docOptions}
-        />
-        <Select
-          label="Also include (compare scope)"
-          value={compareDoc?.id ?? ""}
-          onChange={(event) => setCompareId(event.target.value || null)}
-          options={[
-            { value: "", label: "Just this document" },
-            ...docOptions.filter((option) => option.value !== selectedDoc?.id),
-          ]}
-        />
-      </div>
-
-      {scopedSection !== null ? (
-        <div className="flex items-center gap-2 rounded-md bg-ai-bg px-3 py-2 text-sm">
-          <span>
-            Scoped to <strong>{scopedSection.title}</strong>
-          </span>
-          <Button variant="tertiary" size="sm" onClick={() => setSectionId(null)}>
-            Clear scope
-          </Button>
-        </div>
-      ) : null}
-
-      <div aria-live="polite" className="flex flex-col gap-4">
-        {threads.map((entry, index) => (
-          <div key={`${entry.question}-${index}`} className="flex flex-col gap-2">
-            <p className="text-base font-medium">Q: {entry.question}</p>
-            <AnswerCard
-              response={entry.response}
-              headingRef={
-                focusQuestion === null || entry.question !== focusQuestion
-                  ? undefined
-                  : (node) => {
-                      if (node !== null) {
-                        setFocusQuestion(null);
-                        node.focus();
-                      }
-                    }
-              }
-              onFollowUp={(followUp) => {
-                void submit(followUp);
+          <div className="flex flex-col gap-3">
+            <Select
+              label="Document"
+              value={selectedDoc?.id ?? ""}
+              onChange={(event) => {
+                setDocId(event.target.value || null);
+                setSectionId(null);
               }}
+              options={docOptions}
+            />
+            <Select
+              label="Also include (compare scope)"
+              value={compareDoc?.id ?? ""}
+              onChange={(event) => setCompareId(event.target.value || null)}
+              options={[
+                { value: "", label: "Just this document" },
+                ...docOptions.filter((option) => option.value !== selectedDoc?.id),
+              ]}
             />
           </div>
-        ))}
 
-        {turn !== null && turn.status === "loading" ? (
-          <div role="status" aria-label="Finding evidence">
-            <p className="mb-2 text-sm text-text-secondary">Gemini · Retrieving evidence…</p>
-            <AISkeleton />
-          </div>
-        ) : null}
-
-        {turn !== null && turn.status === "unavailable" ? (
-          <div className="rounded-lg border border-border bg-surface p-4">
-            <p className="text-base font-medium">Answers are temporarily unavailable</p>
-            <Text tone="secondary" className="mt-1 text-sm">
-              The question is kept above — retry in a moment. Your document and scope are unchanged.
-            </Text>
-            <div className="mt-3">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  void submit(turn.question);
-                }}
-              >
-                Retry
+          {scopedSection !== null ? (
+            <div className="flex items-center gap-2 rounded-md bg-ai-muted px-3 py-2 text-sm">
+              <span>
+                Scoped to <strong>{scopedSection.title}</strong>
+              </span>
+              <Button variant="tertiary" size="sm" onClick={() => setSectionId(null)}>
+                Clear scope
               </Button>
             </div>
-          </div>
-        ) : null}
+          ) : null}
 
-        {turn !== null && turn.status === "error" ? (
-          <div className="rounded-lg border border-border bg-surface p-4">
-            <p className="text-base font-medium">The answer didn&apos;t come back</p>
-            <Text tone="secondary" className="mt-1 text-sm">
-              {turn.errorMessage ?? "Something went wrong."} Your question and scope are preserved.
-            </Text>
-            <div className="mt-3">
-              <Button
-                variant="secondary"
-                size="sm"
-                onClick={() => {
-                  void submit(turn.question);
-                }}
-              >
-                Retry
-              </Button>
-            </div>
-          </div>
-        ) : null}
-
-        {threads.length === 0 && turn === null ? (
-          <div className="flex flex-col gap-3">
-            <p className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+          <div className="flex flex-col gap-2">
+            <p className="text-sm font-semibold tracking-wide text-secondary uppercase">
               Try asking
             </p>
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-col items-stretch gap-0.5">
               {SUGGESTED_QUESTIONS.map((question) => (
-                <Button
+                <button
                   key={question}
-                  variant="secondary"
-                  size="sm"
+                  type="button"
                   onClick={() => {
                     void submit(question);
                   }}
+                  className="rounded-md px-2 py-1.5 text-left text-sm transition-colors duration-micro hover:bg-surface-muted hover:text-accent"
                 >
                   {question}
-                </Button>
+                  <span aria-hidden="true" className="ml-1.5 text-xs text-tertiary">
+                    →
+                  </span>
+                </button>
               ))}
             </div>
           </div>
-        ) : null}
-      </div>
 
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-        <Input
-          label="Ask about this document"
-          placeholder="Type your question…"
-          value={draft}
-          onChange={(event) => setDraft(event.target.value)}
-        />
-        <div className="flex flex-wrap gap-2">
-          <Button type="submit" disabled={draft.trim() === "" || turn?.status === "loading"}>
-            Ask
-          </Button>
-          <Button
-            type="button"
-            variant="secondary"
-            onClick={() => setDraft("")}
-            disabled={draft === ""}
-          >
-            Clear
-          </Button>
-          {turn?.status === "loading" ? (
-            <Button type="button" variant="secondary" onClick={cancel}>
-              Cancel
-            </Button>
+          {recentForDoc.length > 0 ? (
+            <section aria-label="Recent questions" className="flex flex-col gap-2">
+              <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">
+                Recent questions
+              </h2>
+              <ul className="flex flex-col gap-1">
+                {recentForDoc.slice(0, 5).map((entry) => (
+                  <li key={`${entry.timestamp}-${entry.question}`}>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        void submit(entry.question);
+                      }}
+                      className="w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-surface-muted"
+                    >
+                      {entry.question}
+                      <span className="ml-2 text-xs text-secondary">{entry.status}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </section>
           ) : null}
-        </div>
-      </form>
+        </aside>
 
-      {recentForDoc.length > 0 ? (
-        <section aria-label="Recent questions" className="flex flex-col gap-2">
-          <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
-            Recent questions
-          </h2>
-          <ul className="flex flex-col gap-1">
-            {recentForDoc.slice(0, 5).map((entry) => (
-              <li key={`${entry.timestamp}-${entry.question}`}>
-                <button
-                  type="button"
-                  onClick={() => {
-                    void submit(entry.question);
+        <div className="order-1 flex min-w-0 flex-col gap-4 lg:order-2">
+          <div aria-live="polite" className="flex flex-col gap-4">
+            {threads.map((entry, index) => (
+              <div key={`${entry.question}-${index}`} className="flex flex-col gap-2">
+                <p className="text-base font-medium">Q: {entry.question}</p>
+                <AnswerCard
+                  response={entry.response}
+                  headingRef={
+                    focusQuestion === null || entry.question !== focusQuestion
+                      ? undefined
+                      : (node) => {
+                          if (node !== null) {
+                            setFocusQuestion(null);
+                            node.focus();
+                          }
+                        }
+                  }
+                  onFollowUp={(followUp) => {
+                    void submit(followUp);
                   }}
-                  className="w-full rounded-md px-2 py-1.5 text-left text-sm hover:bg-neutral-bg"
-                >
-                  {entry.question}
-                  <span className="ml-2 text-xs text-text-secondary">{entry.status}</span>
-                </button>
-              </li>
+                />
+              </div>
             ))}
-          </ul>
-        </section>
-      ) : null}
+
+            {pendingQuestion !== null ? (
+              <div className="flex flex-col gap-2">
+                <p className="text-base font-medium">Q: {pendingQuestion}</p>
+                <div
+                  role="status"
+                  aria-label="Finding evidence"
+                  className="min-h-[120px] rounded-lg border border-dashed border-border bg-surface p-4"
+                >
+                  <p className="mb-2 text-sm text-secondary">Retrieving evidence…</p>
+                  <AISkeleton />
+                </div>
+              </div>
+            ) : null}
+
+            {turn !== null && turn.status === "loading" && pendingQuestion === null ? (
+              <div role="status" aria-label="Finding evidence">
+                <p className="mb-2 text-sm text-secondary">Retrieving evidence…</p>
+                <AISkeleton />
+              </div>
+            ) : null}
+
+            {turn !== null && turn.status === "unavailable" ? (
+              <div className="rounded-lg border border-border bg-surface p-4">
+                <p className="text-base font-medium">Answers are temporarily unavailable</p>
+                <Text tone="secondary" className="mt-1 text-sm">
+                  The question is kept above — retry in a moment. Your document and scope are
+                  unchanged.
+                </Text>
+                <div className="mt-3">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      void submit(turn.question);
+                    }}
+                  >
+                    Retry
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+
+            {turn !== null && turn.status === "error" ? (
+              <div className="rounded-lg border border-border bg-surface p-4">
+                <p className="text-base font-medium">The answer didn&apos;t come back</p>
+                <Text tone="secondary" className="mt-1 text-sm">
+                  {turn.errorMessage ?? "Something went wrong."} Your question and scope are
+                  preserved.
+                </Text>
+                <div className="mt-3">
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      void submit(turn.question);
+                    }}
+                  >
+                    Retry
+                  </Button>
+                </div>
+              </div>
+            ) : null}
+          </div>
+
+          <form
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-3 rounded-lg border border-border bg-surface p-4 shadow-sm"
+          >
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor={composerId} className="text-[15px] font-semibold">
+                Ask about this document
+              </label>
+              <Text tone="secondary" className="text-sm">
+                Answers quote the exact clause — with a jump back to the source.
+              </Text>
+              <textarea
+                id={composerId}
+                rows={2}
+                placeholder="Type your question…"
+                value={draft}
+                onChange={(event) => setDraft(event.target.value)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" && !event.shiftKey) {
+                    if (event.nativeEvent.isComposing || turn?.status === "loading") {
+                      return;
+                    }
+                    event.preventDefault();
+                    void submit(draft);
+                  }
+                }}
+                className="composer-input min-h-11 w-full rounded-md border border-border bg-background px-3 py-2.5 text-base placeholder:text-secondary"
+              />
+            </div>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button type="submit" disabled={draft.trim() === "" || turn?.status === "loading"}>
+                Ask
+              </Button>
+              <Button
+                type="button"
+                variant="secondary"
+                onClick={() => setDraft("")}
+                disabled={draft === ""}
+              >
+                Clear
+              </Button>
+              {turn?.status === "loading" ? (
+                <Button type="button" variant="secondary" onClick={cancel}>
+                  Cancel
+                </Button>
+              ) : null}
+              <p className="ml-auto hidden text-xs text-tertiary sm:block">
+                Enter to send · Shift + Enter for a new line
+              </p>
+            </div>
+          </form>
+        </div>
+
+        <aside
+          aria-label="Evidence"
+          className="order-3 hidden min-w-0 flex-col gap-3 border-l border-border pl-6 xl:flex"
+        >
+          <div className="flex flex-col gap-0.5">
+            <h2 className="text-sm font-semibold tracking-widest text-secondary uppercase">
+              Evidence
+            </h2>
+            <p className="text-xs text-tertiary">Source context for the latest answer.</p>
+          </div>
+          {latest === null || latest.response.citations.length === 0 ? (
+            <p className="text-sm text-secondary">
+              Evidence appears here after your first answer — every quote links back to its clause.
+            </p>
+          ) : (
+            <div className="flex flex-col gap-3">
+              <p className="text-sm">
+                <span className="font-medium">Q: </span>
+                {latest.question}
+              </p>
+              <ul className="flex flex-col gap-3">
+                {latest.response.citations.map((citation) => (
+                  <li key={citation.clauseId} className="border-l-2 border-l-evidence-border pl-3">
+                    <p className="font-doc text-[15px] leading-6">“{citation.quote}”</p>
+                    <p className="mt-1 font-evidence text-xs text-secondary">{citation.location}</p>
+                    <a
+                      href={`/review/${citation.documentId}#viewer-${citation.sectionId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-block text-sm font-medium text-accent underline underline-offset-2"
+                    >
+                      Open source <span aria-hidden="true">↗</span>
+                      <span className="sr-only">(opens in a new tab)</span>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </aside>
+      </div>
     </div>
   );
 }

@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Card } from "@/components/ui/Card";
+import { Notice } from "@/components/ui/Notice";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Heading } from "@/components/ui/Heading";
 import { Select } from "@/components/ui/Select";
@@ -158,106 +159,141 @@ export function CompareWorkspace() {
   }));
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="mx-auto flex w-full flex-col gap-6">
       <div className="flex flex-col gap-1">
+        <p className="font-evidence text-xs font-semibold tracking-widest text-tertiary uppercase">
+          Document comparison
+        </p>
         <Heading level={1}>Compare versions</Heading>
-        <Text tone="secondary">
+        <Text tone="secondary" className="text-sm">
           Choose two versions to see what changed — and whether it matters.
         </Text>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-[1fr_auto_1fr] sm:items-end">
-        <Select
-          label="Version 1 · earlier"
-          value={leftDoc?.id ?? ""}
-          onChange={(event) => setLeftPick(event.target.value || null)}
-          options={[{ value: "", label: "Select a document" }, ...options]}
-        />
-        <Button
-          variant="secondary"
-          size="sm"
-          onClick={() => {
-            setLeftPick(rightDoc?.id ?? null);
-            setRightPick(leftDoc?.id ?? null);
-          }}
-        >
-          Swap
-        </Button>
-        <Select
-          label="Version 2 · later"
-          value={rightDoc?.id ?? ""}
-          onChange={(event) => setRightPick(event.target.value || null)}
-          options={[{ value: "", label: "Select a document" }, ...options]}
-        />
+      <div className="rounded-lg border border-border bg-surface p-4 shadow-sm sm:p-5">
+        <div className="grid gap-4 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] sm:items-end">
+          <Select
+            label="Version 1 · earlier"
+            value={leftDoc?.id ?? ""}
+            onChange={(event) => setLeftPick(event.target.value || null)}
+            options={[{ value: "", label: "Select a document" }, ...options]}
+          />
+          <div className="flex items-center justify-center gap-2 sm:flex-col sm:gap-1 sm:pb-0.5">
+            <span
+              aria-hidden="true"
+              className="inline-flex size-8 items-center justify-center rounded-full bg-surface-muted font-evidence text-xs font-bold text-secondary"
+            >
+              VS
+            </span>
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={() => {
+                setLeftPick(rightDoc?.id ?? null);
+                setRightPick(leftDoc?.id ?? null);
+              }}
+            >
+              Swap
+            </Button>
+          </div>
+          <Select
+            label="Version 2 · later"
+            value={rightDoc?.id ?? ""}
+            onChange={(event) => setRightPick(event.target.value || null)}
+            options={[{ value: "", label: "Select a document" }, ...options]}
+          />
+        </div>
       </div>
 
       {sameSelection ? (
-        <div role="alert" className="rounded-lg border border-warning/40 bg-warning-bg px-4 py-3">
+        <div role="alert" className="rounded-lg border border-warning bg-warning-muted px-4 py-3">
           <Text>Choose two different documents to compare.</Text>
         </div>
       ) : null}
 
       {(status === "loading" || status === "idle") && !sameSelection ? (
         <div className="flex flex-col gap-3" role="status" aria-label="Comparing versions">
-          <p className="text-sm text-text-secondary">Gemini · Comparing versions…</p>
+          <p className="text-sm text-secondary">Gemini · Comparing versions…</p>
           <AISkeleton />
         </div>
       ) : null}
 
       {status === "unavailable" ? (
-        <Card>
-          <p className="text-base font-medium">Comparison is temporarily unavailable</p>
-          <Text tone="secondary" className="mt-1 text-sm">
-            The AI comparison service isn&apos;t reachable right now. Your documents are untouched —
-            try again in a moment.
-          </Text>
-          <div className="mt-3">
+        <Notice
+          title="Comparison is temporarily unavailable"
+          action={
             <Button variant="secondary" size="sm" onClick={() => setNonce((n) => n + 1)}>
               Retry
             </Button>
-          </div>
-        </Card>
+          }
+        >
+          The AI comparison service isn&apos;t reachable right now. Your documents are untouched —
+          try again in a moment.
+        </Notice>
       ) : null}
 
       {status === "error" ? (
-        <Card>
-          <p className="text-base font-medium">The comparison didn&apos;t complete</p>
-          <Text tone="secondary" className="mt-1 text-sm">
-            {errorMessage ?? "Comparison failed unexpectedly."} Both documents are preserved —
-            adjust the selection or retry.
-          </Text>
-          <div className="mt-3">
+        <Notice
+          title="The comparison didn't complete"
+          action={
             <Button variant="secondary" size="sm" onClick={retry}>
               Retry
             </Button>
-          </div>
-        </Card>
+          }
+        >
+          {errorMessage ?? "Comparison failed unexpectedly."} Both documents are preserved — adjust
+          the selection or retry.
+        </Notice>
       ) : null}
 
       {status === "ready" && data !== null ? (
         <div className="flex flex-col gap-6">
           <Card>
-            <p className="text-xs font-medium tracking-wide text-ai uppercase">
+            <p className="text-xs font-medium tracking-wide text-ai-accent uppercase">
               Comparison summary
             </p>
-            <p className="mt-2 text-base">{data.verdict}</p>
+            <p className="mt-2 text-section-title font-semibold tracking-tight text-balance">
+              {data.verdict}
+            </p>
             <Text tone="secondary" className="mt-1 text-sm">
               {data.summary}
             </Text>
             {data.verdictDrivers.length > 0 ? (
               <ul className="mt-3 flex flex-wrap gap-2">
                 {data.verdictDrivers.map((driver) => (
-                  <li key={driver} className="rounded-full bg-neutral-bg px-2.5 py-1 text-xs">
+                  <li key={driver} className="rounded-full bg-surface-muted px-2.5 py-1 text-xs">
                     {driver}
                   </li>
                 ))}
               </ul>
             ) : null}
-            <p className="mt-3 text-sm text-text-secondary">
+            <p className="mt-3 text-sm text-secondary tabular-nums">
               {data.changes.length} {data.changes.length === 1 ? "change" : "changes"} ·{" "}
               {data.silence.length} silence {data.silence.length === 1 ? "finding" : "findings"} ·{" "}
               {data.unchangedCount} unchanged {data.unchangedCount === 1 ? "section" : "sections"}
             </p>
+            {categories.length > 0 ? (
+              <div className="mt-3 flex flex-wrap gap-1.5" aria-label="Filter by category">
+                {categories.map((category) => {
+                  const active = categoryFilter === category;
+                  return (
+                    <button
+                      key={category}
+                      type="button"
+                      aria-pressed={active}
+                      onClick={() => setCategoryFilter(active ? "all" : category)}
+                      className={
+                        active
+                          ? "rounded-full bg-accent px-2.5 py-1 text-xs font-medium text-white"
+                          : "rounded-full border border-border bg-surface px-2.5 py-1 text-xs text-secondary transition-colors duration-micro hover:border-secondary hover:text-primary"
+                      }
+                    >
+                      {category}
+                    </button>
+                  );
+                })}
+              </div>
+            ) : null}
           </Card>
 
           <div className="flex flex-wrap gap-3">
@@ -299,14 +335,61 @@ export function CompareWorkspace() {
             />
           </div>
 
+          {kindFilter !== "all" || categoryFilter !== "all" ? (
+            <div className="flex flex-wrap gap-2" aria-label="Active filters">
+              {kindFilter !== "all" ? (
+                <button
+                  type="button"
+                  aria-label={`Remove ${kindFilter} filter`}
+                  onClick={() => setKindFilter("all")}
+                  className="min-h-11 rounded-full border border-border bg-surface px-3 py-1 text-sm hover:border-secondary"
+                >
+                  {kindFilter} ✕
+                </button>
+              ) : null}
+              {categoryFilter !== "all" ? (
+                <button
+                  type="button"
+                  aria-label={`Remove ${categoryFilter} filter`}
+                  onClick={() => setCategoryFilter("all")}
+                  className="min-h-11 rounded-full border border-border bg-surface px-3 py-1 text-sm hover:border-secondary"
+                >
+                  {categoryFilter} ✕
+                </button>
+              ) : null}
+            </div>
+          ) : null}
+
           {visibleChanges.length === 0 && visibleSilence.length === 0 ? (
             <EmptyState
               title="No changes match these filters"
               description="Broaden the filters to see the full comparison."
+              action={
+                <div className="flex flex-col items-center gap-2">
+                  {kindFilter !== "all" || categoryFilter !== "all" ? (
+                    <p className="text-sm text-secondary tabular-nums">
+                      Active filters: {kindFilter} · {categoryFilter}
+                    </p>
+                  ) : null}
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    onClick={() => {
+                      setKindFilter("all");
+                      setCategoryFilter("all");
+                    }}
+                  >
+                    Clear filters
+                  </Button>
+                </div>
+              }
             />
           ) : (
             <div className="grid gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
-              <nav aria-label="Changes" className="flex flex-col gap-2">
+              <nav
+                aria-label="Changes"
+                className="flex min-w-0 flex-col gap-2 self-start lg:sticky lg:top-32 lg:max-h-[70vh] lg:overflow-y-auto"
+              >
                 {visibleChanges.map((change) => {
                   const active = selected?.id === change.id;
                   return (
@@ -314,15 +397,24 @@ export function CompareWorkspace() {
                       key={change.id}
                       type="button"
                       onClick={() => setSelectedId(change.id)}
-                      aria-current={active ? "true" : undefined}
+                      aria-current={active ? true : undefined}
                       className={cn(
-                        "flex flex-col gap-1.5 rounded-lg border p-3 text-left transition-colors",
+                        "flex min-w-0 flex-col gap-1.5 rounded-lg border p-3 text-left transition-colors duration-micro",
                         active
-                          ? "border-accent bg-accent/5"
-                          : "border-border bg-surface hover:border-text-secondary",
+                          ? "border-accent bg-accent-muted"
+                          : "border-border bg-surface hover:border-secondary",
                       )}
                     >
-                      <span className="flex flex-wrap gap-1.5">
+                      <span className="flex flex-wrap items-center gap-1.5">
+                        <span
+                          aria-hidden="true"
+                          className={cn(
+                            "size-1.5 shrink-0 rounded-full",
+                            change.type === "changed" && "bg-warning",
+                            change.type === "added" && "bg-success",
+                            change.type === "removed" && "bg-critical",
+                          )}
+                        />
                         <Badge
                           tone={
                             change.type === "changed"
@@ -338,8 +430,10 @@ export function CompareWorkspace() {
                           <Badge tone="concern">Potentially important</Badge>
                         ) : null}
                       </span>
-                      <span className="text-[15px] font-medium">{change.clauseTitle}</span>
-                      <span className="text-sm text-text-secondary">{change.plainExplanation}</span>
+                      <span className="truncate text-[15px] font-medium">{change.clauseTitle}</span>
+                      <span className="line-clamp-2 text-sm text-secondary">
+                        {change.plainExplanation}
+                      </span>
                     </button>
                   );
                 })}
@@ -363,7 +457,7 @@ export function CompareWorkspace() {
 
           {visibleSilence.length > 0 ? (
             <section aria-label="Silence findings" className="flex flex-col gap-3">
-              <h2 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+              <h2 className="text-sm font-semibold tracking-wide text-secondary uppercase">
                 Silence findings · {visibleSilence.length}
               </h2>
               {visibleSilence.map((finding) => (
@@ -377,7 +471,7 @@ export function CompareWorkspace() {
             </section>
           ) : null}
 
-          <div className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2 tabular-nums">
             <Button
               variant="tertiary"
               size="sm"
@@ -388,7 +482,7 @@ export function CompareWorkspace() {
               {data.unchangedCount === 1 ? "section" : "sections"}
             </Button>
             {showUnchanged && data.unchangedCount > 0 ? (
-              <p className="text-sm text-text-secondary">
+              <p className="text-sm text-secondary">
                 Identical in both versions and excluded from analysis.
               </p>
             ) : null}
@@ -396,7 +490,7 @@ export function CompareWorkspace() {
         </div>
       ) : null}
 
-      <p className="text-xs text-text-secondary">
+      <p className="text-xs text-secondary">
         Comparison explains document differences. It is not legal advice.
       </p>
     </div>

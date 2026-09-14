@@ -3,12 +3,13 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
+import { Notice } from "@/components/ui/Notice";
 import { Select } from "@/components/ui/Select";
 import { Tabs } from "@/components/ui/Tabs";
 import { Text } from "@/components/ui/Text";
 import { AISkeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
+import { EvidenceReference } from "@/components/documents/EvidenceReference";
 import { useReviewGuide } from "@/components/documents/use-review-guide";
 import { useDocuments } from "@/lib/documents/store";
 import type { ReviewGuideItem, ReviewGuideItemKind } from "@/lib/domain/types";
@@ -104,7 +105,7 @@ export function ReviewGuidePanel({
 
   if (status === "idle") {
     return (
-      <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-bg px-4 py-5">
+      <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-background px-4 py-5">
         <p className="text-base font-medium">Prepare to discuss</p>
         <Text tone="secondary" className="text-sm">
           Turn this review into discussion topics, questions, clarifications, and a checklist — each
@@ -122,7 +123,7 @@ export function ReviewGuidePanel({
   if (status === "loading") {
     return (
       <div className="flex flex-col gap-3" role="status" aria-label="Preparing Review Guide">
-        <p className="text-sm text-text-secondary">Preparing your Review Guide…</p>
+        <p className="text-sm text-secondary">Preparing your Review Guide…</p>
         <AISkeleton />
         <div>
           <Button variant="secondary" size="sm" onClick={cancel}>
@@ -176,8 +177,11 @@ export function ReviewGuidePanel({
 
   return (
     <div className="flex flex-col gap-3">
+      <p className="font-evidence text-xs text-tertiary tabular-nums">
+        Prepared from {title} · v{version}
+      </p>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-secondary">
           PlainTerms prepared this guide from the document
           {guide.compareDocumentId === null ? "." : " and its comparison."}
         </p>
@@ -199,7 +203,7 @@ export function ReviewGuidePanel({
             })),
           ]}
         />
-        <p className="text-xs text-text-secondary">
+        <p className="text-xs text-secondary">
           Changing the comparison applies the next time you generate.
         </p>
       </div>
@@ -276,7 +280,7 @@ export function ReviewGuidePanel({
                   onJump={onSelectSection}
                 />
                 {byKind("lawyer-question").length > 0 ? (
-                  <div className="rounded-md border border-ai/40 bg-ai-bg/40 px-3 py-2">
+                  <div className="rounded-md border border-ai-accent bg-ai-muted px-3 py-2">
                     <p className="text-sm font-semibold">
                       For discussion with a qualified legal professional
                     </p>
@@ -348,7 +352,7 @@ export function ReviewGuidePanel({
           Export PDF
         </Button>
       </div>
-      <p className="text-xs text-text-secondary">
+      <p className="text-xs text-secondary">
         Copy and print use this guide&apos;s content. PDF export arrives with the export backend.
       </p>
     </div>
@@ -367,17 +371,16 @@ function GuideNotice({
   readonly onAction: () => void;
 }) {
   return (
-    <Card>
-      <p className="text-base font-medium">{title}</p>
-      <Text tone="secondary" className="mt-1 text-sm">
-        {detail}
-      </Text>
-      <div className="mt-3">
+    <Notice
+      title={title}
+      action={
         <Button variant="secondary" size="sm" onClick={onAction}>
           {actionLabel}
         </Button>
-      </div>
-    </Card>
+      }
+    >
+      {detail}
+    </Notice>
   );
 }
 
@@ -400,7 +403,7 @@ function ItemList({
 }) {
   return (
     <section aria-label={heading} className="flex flex-col gap-2">
-      <h3 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+      <h3 className="border-b border-border-subtle pb-1.5 text-xs font-semibold tracking-wider text-secondary uppercase">
         {heading}
       </h3>
       {items.length === 0 ? (
@@ -408,9 +411,11 @@ function ItemList({
           {empty}
         </Text>
       ) : (
-        items.map((item) => (
-          <GuideItemCard key={item.id} item={item} jump={jumpFor(item)} onJump={onJump} />
-        ))
+        <div className="flex flex-col divide-y divide-border">
+          {items.map((item) => (
+            <GuideItemCard key={item.id} item={item} jump={jumpFor(item)} onJump={onJump} />
+          ))}
+        </div>
       )}
     </section>
   );
@@ -426,26 +431,25 @@ function GuideItemCard({
   readonly onJump: (sectionId: string) => void;
 }) {
   return (
-    <article className="rounded-lg border border-border bg-surface p-3">
+    <article className="py-3">
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone={PRIORITY_TONE[item.priority]}>{PRIORITY_LABEL[item.priority]}</Badge>
       </div>
       <h4 className="mt-2 text-[15px] font-semibold">{item.title}</h4>
       <p className="mt-1 text-sm">{item.summary}</p>
       {item.evidence !== null ? (
-        <blockquote className="font-doc mt-2 border-l-2 border-evidence-border bg-evidence/40 px-3 py-2 text-[15px]">
-          “{item.evidence.quote}”
-          <footer className="font-evidence mt-1 text-xs text-text-secondary">
-            {item.evidence.location}
-          </footer>
-        </blockquote>
+        <EvidenceReference
+          quote={`“${item.evidence.quote}”`}
+          location={item.evidence.location}
+          className="mt-2"
+        />
       ) : (
-        <p className="mt-2 text-sm text-text-secondary">
+        <p className="mt-2 text-sm text-secondary">
           Not stated in the document — confirm independently.
         </p>
       )}
       {item.uncertainty !== null ? (
-        <p className="mt-2 text-sm text-text-secondary">{item.uncertainty}</p>
+        <p className="mt-2 text-sm text-secondary">{item.uncertainty}</p>
       ) : null}
       {jump === null ? null : jump.mode === "same-tab" ? (
         <div className="mt-2">

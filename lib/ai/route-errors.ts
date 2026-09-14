@@ -31,10 +31,7 @@ export function aiErrorResponse(
         : error.category === "timeout"
           ? "ai-timeout"
           : "ai-error";
-    return NextResponse.json(
-      { code, message: error.message, requestId: error.requestId },
-      { status },
-    );
+    return NextResponse.json({ code, message: error.message }, { status });
   }
   logger.error("AI request failed unexpectedly", {
     ...(context?.documentId === undefined ? {} : { documentId: context.documentId }),
@@ -42,7 +39,7 @@ export function aiErrorResponse(
     requestId: fallbackRequestId,
   });
   return NextResponse.json(
-    { code: "ai-error", message: "Analysis failed unexpectedly.", requestId: fallbackRequestId },
+    { code: "ai-error", message: "Analysis failed unexpectedly." },
     { status: 502 },
   );
 }

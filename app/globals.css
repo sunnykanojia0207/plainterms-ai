@@ -2,136 +2,149 @@
 
 /*
  * PlainTerms design tokens — single source of truth.
- * Source: PLAINTERMS_UI_UX_SPECIFICATION.md §20 (Color System) + §25 (Tokens).
+ * Phase 2a: warm paper + ink, verbatim architect spec.
  * All product color MUST come from these tokens. No hex values in components.
  */
 
 :root {
   color-scheme: light;
 
-  --bg: #fafaf8;
+  --background: #faf7f2;
   --surface: #ffffff;
-  --surface-elevated: #ffffff;
+  --surface-raised: #ffffff;
+  --surface-muted: #f1eee6;
+  --border: #e3ded2;
+  --border-subtle: #ece8dd;
   --text-primary: #1a1c1e;
-  --text-secondary: #5b6068;
-  --border: #e5e3dd;
-  --accent: #1d4ed8;
-  --accent-hover: #1e40af;
-  --ai: #6d28d9;
-  --ai-bg: #f3eefd;
+  --text-secondary: #5b5750;
+  --text-tertiary: #6f6a5e;
+  --accent: #2f4bc2;
+  --accent-hover: #243b9e;
+  --accent-muted: #e8edfb;
+  --ai-accent: #6d28d9;
+  --ai-muted: #f1eafd;
   --success: #166534;
-  --success-bg: #dcfce7;
-  --warning: #92400e;
-  --warning-bg: #fef3c7;
-  --concern: #b45309;
-  --concern-bg: #fef3c7;
-  --critical: #b91c1c;
-  --critical-bg: #fee2e2;
-  --neutral: #6b7280;
-  --neutral-bg: #f1f0ec;
-  --added: #166534;
-  --added-bg: #dcfce7;
-  --removed: #b91c1c;
-  --removed-bg: #fee2e2;
-  --changed: #92400e;
-  --changed-bg: #fef3c7;
-  --evidence: #dbeafe;
-  --evidence-border: #93c5fd;
+  --success-muted: #e7f2e9;
+  --warning: #7c4a0a;
+  --warning-muted: #fbf0d9;
+  --concern: #92400e;
+  --concern-muted: #fbeedc;
+  --critical: #b42318;
+  --critical-muted: #fbe7e4;
+  --evidence: #e2eafb;
+  --evidence-border: #9ab4e6;
+  --selection: #d9e6fc;
+  --focus: #2f4bc2;
+  --overlay: rgba(26, 28, 30, 0.5);
+
+  --font-ui:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-doc: Georgia, "Times New Roman", Times, serif;
+  --font-evidence:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  --radius-sm: 6px;
+  --radius-md: 12px;
+  --radius-lg: 22px;
+
+  --duration-micro: 120ms;
+  --duration-standard: 220ms;
+  --duration-reading: 300ms;
 
   --shadow-sm: 0 1px 2px rgb(26 28 30 / 0.06);
   --shadow-md: 0 8px 24px rgb(26 28 30 / 0.12);
-
-  --focus-ring: 0 0 0 2px var(--bg), 0 0 0 4px var(--accent);
 }
 
 .dark {
   color-scheme: dark;
 
-  --bg: #131416;
-  --surface: #1c1e21;
-  --surface-elevated: #24272c;
-  --text-primary: #f2f3f5;
-  --text-secondary: #a8adb7;
-  --border: #33373d;
-  --accent: #7aa2f7;
-  --accent-hover: #9db9f8;
-  --ai: #b79df5;
-  --ai-bg: #2b2140;
-  --success: #7bd88f;
-  --success-bg: #173b24;
-  --warning: #e8b34b;
-  --warning-bg: #3d2f12;
-  --concern: #e8a04b;
-  --concern-bg: #3d2a12;
-  --critical: #f08a8a;
-  --critical-bg: #451a1a;
-  --neutral: #9aa0ab;
-  --neutral-bg: #26292f;
-  --added: #7bd88f;
-  --added-bg: #173b24;
-  --removed: #f08a8a;
-  --removed-bg: #451a1a;
-  --changed: #e8b34b;
-  --changed-bg: #3d2f12;
-  --evidence: #1e3a5f;
-  --evidence-border: #3b6ea5;
+  --background: #16181d;
+  --surface: #1e2128;
+  --surface-raised: #262c36;
+  --surface-muted: #232833;
+  --border: #333a47;
+  --border-subtle: #272d39;
+  --text-primary: #f2eee6;
+  --text-secondary: #b9b4a8;
+  --text-tertiary: #98938a;
+  --accent: #9db4fa;
+  --accent-hover: #b4c6fc;
+  --accent-muted: #26304f;
+  --ai-accent: #c9b5f5;
+  --ai-muted: #2b2540;
+  --success: #86d598;
+  --success-muted: #1a3324;
+  --warning: #e5b85c;
+  --warning-muted: #38300f;
+  --concern: #e8a45c;
+  --concern-muted: #38290f;
+  --critical: #f0968e;
+  --critical-muted: #3e1c1b;
+  --evidence: #22344f;
+  --evidence-border: #4a6fa0;
+  --selection: #2c3d61;
+  --focus: #9db4fa;
+  --overlay: rgba(0, 0, 0, 0.6);
 
   --shadow-sm: 0 1px 2px rgb(0 0 0 / 0.4);
   --shadow-md: 0 8px 24px rgb(0 0 0 / 0.45);
 }
 
 @theme inline {
-  --color-bg: var(--bg);
+  --color-background: var(--background);
   --color-surface: var(--surface);
-  --color-surface-elevated: var(--surface-elevated);
-  --color-text-primary: var(--text-primary);
-  --color-text-secondary: var(--text-secondary);
+  --color-surface-raised: var(--surface-raised);
+  --color-surface-muted: var(--surface-muted);
   --color-border: var(--border);
+  --color-border-subtle: var(--border-subtle);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
-  --color-ai: var(--ai);
-  --color-ai-bg: var(--ai-bg);
+  --color-accent-muted: var(--accent-muted);
+  --color-ai-accent: var(--ai-accent);
+  --color-ai-muted: var(--ai-muted);
   --color-success: var(--success);
-  --color-success-bg: var(--success-bg);
+  --color-success-muted: var(--success-muted);
   --color-warning: var(--warning);
-  --color-warning-bg: var(--warning-bg);
+  --color-warning-muted: var(--warning-muted);
   --color-concern: var(--concern);
-  --color-concern-bg: var(--concern-bg);
+  --color-concern-muted: var(--concern-muted);
   --color-critical: var(--critical);
-  --color-critical-bg: var(--critical-bg);
-  --color-neutral: var(--neutral);
-  --color-neutral-bg: var(--neutral-bg);
-  --color-added: var(--added);
-  --color-added-bg: var(--added-bg);
-  --color-removed: var(--removed);
-  --color-removed-bg: var(--removed-bg);
-  --color-changed: var(--changed);
-  --color-changed-bg: var(--changed-bg);
+  --color-critical-muted: var(--critical-muted);
   --color-evidence: var(--evidence);
   --color-evidence-border: var(--evidence-border);
+  --color-selection: var(--selection);
+  --color-focus: var(--focus);
+  --color-overlay: var(--overlay);
 
   --shadow-sm: var(--shadow-sm);
   --shadow-md: var(--shadow-md);
 
-  /* Typography roles: UI voice / AI voice / document voice / evidence voice. */
+  /* Type scale (Tailwind text-* utilities). */
   --font-ui:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial,
-    sans-serif;
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
   --font-doc: Georgia, "Times New Roman", Times, serif;
   --font-evidence:
     ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
 
-  --text-display: 1.75rem;
-  --text-display--line-height: 2.25rem;
+  --text-display: 2.125rem;
+  --text-display--line-height: 2.5rem;
   --text-h2: 1.375rem;
   --text-h2--line-height: 1.875rem;
+  --text-page-title: 1.5rem;
+  --text-page-title--line-height: 2rem;
+  --text-section-title: 1.125rem;
+  --text-section-title--line-height: 1.625rem;
 
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
 
-  --animate-duration-micro: 120ms;
-  --animate-duration-standard: 250ms;
+  --transition-duration-micro: var(--duration-micro);
+  --transition-duration-standard: var(--duration-standard);
+  --transition-duration-reading: var(--duration-reading);
 }
 
 html {
@@ -139,7 +152,7 @@ html {
 }
 
 body {
-  background: var(--bg);
+  background: var(--background);
   color: var(--text-primary);
   font-family: var(--font-ui);
   font-size: 1rem;
@@ -155,14 +168,26 @@ body {
 }
 
 ::selection {
-  background: var(--evidence);
+  background: var(--selection);
 }
 
 /* Visible focus everywhere. Never suppressed. */
 :focus-visible {
-  outline: none;
-  box-shadow: var(--focus-ring);
-  border-radius: 4px;
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid Highlight;
+  }
+}
+
+.composer-input {
+  field-sizing: content;
+  min-height: 44px;
+  max-height: 12rem;
+  overflow-y: auto;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -173,5 +198,24 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+}
+
+@media print {
+  header,
+  footer,
+  aside {
+    display: none !important;
+  }
+  main {
+    max-width: none !important;
+  }
+  body,
+  .font-doc {
+    font-size: 12pt;
+    line-height: 1.5;
+  }
+  h3 {
+    break-before: page;
   }
 }

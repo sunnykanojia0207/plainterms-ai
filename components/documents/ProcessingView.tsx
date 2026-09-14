@@ -118,7 +118,7 @@ export function ProcessingView({ documentId, initialOutcome }: ProcessingViewPro
     return (
       <div className="mx-auto flex max-w-xl flex-col gap-4 py-10">
         <Heading level={1}>We couldn&apos;t prepare that document</Heading>
-        <div role="alert" className="rounded-lg border border-critical/40 bg-critical-bg px-4 py-3">
+        <div role="alert" className="rounded-lg border border-critical bg-critical-muted px-4 py-3">
           <Text>
             “{document.title}” couldn&apos;t be prepared for review. Your file is unchanged —
             nothing was lost.
@@ -189,14 +189,14 @@ export function ProcessingView({ documentId, initialOutcome }: ProcessingViewPro
                 aria-hidden="true"
                 className={cn(
                   "flex size-6 shrink-0 items-center justify-center rounded-full text-sm",
-                  done && "bg-success-bg text-success",
-                  active && "bg-accent/10 text-accent",
-                  !done && !active && "bg-neutral-bg text-text-secondary",
+                  done && "bg-success-muted text-success",
+                  active && "bg-accent-muted text-accent",
+                  !done && !active && "bg-surface-muted text-secondary",
                 )}
               >
                 {done ? "✓" : active ? "●" : "○"}
               </span>
-              <span className={cn("text-base", active ? "font-medium" : "text-text-secondary")}>
+              <span className={cn("text-base", active ? "font-medium" : "text-secondary")}>
                 {stage.label}
                 {stage.id === "ready" ? "" : "…"}
               </span>

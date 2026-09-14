@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Heading } from "@/components/ui/Heading";
 import { Text } from "@/components/ui/Text";
+
+export const metadata: Metadata = {
+  title: "Review",
+  description:
+    "Read your client contract beside plain-language guidance, with every claim traced to its source clause.",
+};
 
 /**
  * Review index — reached when no document is selected. Routes the user to

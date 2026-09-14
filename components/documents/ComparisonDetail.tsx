@@ -1,6 +1,7 @@
 "use client";
 
 import { Badge } from "@/components/ui/Badge";
+import { EvidenceReference } from "@/components/documents/EvidenceReference";
 import { CONFIDENCE_META } from "@/lib/domain/vocabulary";
 import type { ComparisonChange, SilenceFinding } from "@/lib/domain/types";
 
@@ -67,58 +68,62 @@ export function ChangeDetail({
       <h3 className="text-lg font-semibold">{change.clauseTitle}</h3>
 
       <div className="grid gap-3 md:grid-cols-2">
-        <div className="rounded-md border border-border bg-bg p-3">
-          <p className="text-xs font-semibold tracking-wide text-text-secondary uppercase">
+        <div className="min-w-0">
+          <p className="font-evidence mb-2 text-xs font-semibold tracking-wide text-secondary uppercase">
             Version 1{change.leftRef === null ? "" : ` · ${change.leftRef}`}
           </p>
-          <blockquote className="font-doc mt-2 text-[15px]">
-            {change.leftText ?? "Not present in Version 1."}
-          </blockquote>
-          {change.leftSectionId === null ? null : (
-            <p className="mt-2">
-              <JumpLink
-                href={`/review/${leftDocumentId}#viewer-${change.leftSectionId}`}
-                label="Jump to Version 1"
-              />
-            </p>
-          )}
+          <EvidenceReference
+            variant="plain"
+            quote={change.leftText ?? "Not present in Version 1."}
+            location={change.leftRef ?? ""}
+            action={
+              change.leftSectionId === null ? null : (
+                <JumpLink
+                  href={`/review/${leftDocumentId}#viewer-${change.leftSectionId}`}
+                  label="Jump to Version 1"
+                />
+              )
+            }
+          />
         </div>
-        <div className="rounded-md border border-border bg-bg p-3">
-          <p className="text-xs font-semibold tracking-wide text-text-secondary uppercase">
+        <div className="min-w-0">
+          <p className="font-evidence mb-2 text-xs font-semibold tracking-wide text-secondary uppercase">
             Version 2{change.rightRef === null ? "" : ` · ${change.rightRef}`}
           </p>
-          <blockquote className="font-doc mt-2 text-[15px]">
-            {change.rightText ?? "Not present in Version 2."}
-          </blockquote>
-          {change.rightSectionId === null ? null : (
-            <p className="mt-2">
-              <JumpLink
-                href={`/review/${rightDocumentId}#viewer-${change.rightSectionId}`}
-                label="Jump to Version 2"
-              />
-            </p>
-          )}
+          <EvidenceReference
+            variant="plain"
+            quote={change.rightText ?? "Not present in Version 2."}
+            location={change.rightRef ?? ""}
+            action={
+              change.rightSectionId === null ? null : (
+                <JumpLink
+                  href={`/review/${rightDocumentId}#viewer-${change.rightSectionId}`}
+                  label="Jump to Version 2"
+                />
+              )
+            }
+          />
         </div>
       </div>
 
-      <dl className="flex flex-col gap-3">
-        <div>
+      <dl className="flex flex-col gap-3 sm:grid sm:grid-cols-[160px_1fr] sm:gap-x-4 sm:gap-y-3">
+        <div className="sm:contents">
           <dt className="text-sm font-semibold">What changed</dt>
           <dd className="text-[15px]">{change.plainExplanation}</dd>
         </div>
-        <div>
+        <div className="sm:contents">
           <dt className="text-sm font-semibold">Why it matters</dt>
           <dd className="text-[15px]">{change.whyItMatters}</dd>
         </div>
-        <div>
+        <div className="sm:contents">
           <dt className="text-sm font-semibold">Potential implication</dt>
           <dd className="text-[15px]">{change.implication}</dd>
         </div>
-        <div>
+        <div className="sm:contents">
           <dt className="text-sm font-semibold">Question to consider</dt>
           <dd className="text-[15px]">{change.questionToConsider}</dd>
         </div>
-        <div>
+        <div className="sm:contents">
           <dt className="text-sm font-semibold">Potential next step</dt>
           <dd className="text-[15px]">{change.recommendedNextStep}</dd>
         </div>
@@ -159,18 +164,17 @@ export function SilenceCard({
         <div>
           <dt className="text-sm font-semibold">Where it appeared in Version 1</dt>
           <dd>
-            <blockquote className="font-doc mt-1 border-l-2 border-evidence-border bg-evidence/40 px-3 py-2">
-              “{finding.leftEvidence?.quote ?? ""}”
-              <footer className="font-evidence mt-1 text-xs text-text-secondary">
-                {finding.leftEvidence?.location ?? ""}
-              </footer>
-            </blockquote>
-            <p className="mt-2">
-              <JumpLink
-                href={`/review/${leftDocumentId}#viewer-${finding.leftEvidence?.sectionId ?? ""}`}
-                label="Jump to Version 1"
-              />
-            </p>
+            <EvidenceReference
+              quote={`“${finding.leftEvidence?.quote ?? ""}”`}
+              location={finding.leftEvidence?.location ?? ""}
+              className="mt-1"
+              action={
+                <JumpLink
+                  href={`/review/${leftDocumentId}#viewer-${finding.leftEvidence?.sectionId ?? ""}`}
+                  label="Jump to Version 1"
+                />
+              }
+            />
           </dd>
         </div>
         <div>

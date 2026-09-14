@@ -78,29 +78,36 @@ export function DocumentViewer({ sections, activeId, onActiveChange }: DocumentV
     <article
       ref={rootRef}
       aria-label="Document text"
-      className="font-doc mx-auto max-w-[68ch] text-text-primary"
+      className="font-doc mx-auto max-w-[65ch] text-primary"
     >
-      {sections.map((section) => (
-        <section
-          key={section.id}
-          id={`viewer-${section.id}`}
-          data-section-id={section.id}
-          aria-labelledby={`viewer-title-${section.id}`}
-          className="scroll-mt-24 border-b border-border py-6 first:pt-0 last:border-b-0"
-        >
-          <h2
-            id={`viewer-title-${section.id}`}
-            className="mb-4 font-ui text-lg font-semibold tracking-tight"
+      {sections.map((section) => {
+        const active = section.id === activeId;
+        return (
+          <section
+            key={section.id}
+            id={`viewer-${section.id}`}
+            data-section-id={section.id}
+            aria-labelledby={`viewer-title-${section.id}`}
+            className={`scroll-mt-32 border-b border-border py-6 first:pt-0 last:border-b-0 ${
+              active
+                ? "border-l-2 border-l-warning bg-warning-muted/40"
+                : "border-l-2 border-l-transparent"
+            } -ml-3 pl-3 sm:-ml-4 sm:pl-4`}
           >
-            {section.title}
-          </h2>
-          {section.paragraphs.map((paragraph, index) => (
-            <p key={`${section.id}-p${index}`} className="mb-4 last:mb-0">
-              {paragraph}
-            </p>
-          ))}
-        </section>
-      ))}
+            <h2
+              id={`viewer-title-${section.id}`}
+              className="mb-4 font-ui text-lg font-semibold tracking-tight"
+            >
+              {section.title}
+            </h2>
+            {section.paragraphs.map((paragraph, index) => (
+              <p key={`${section.id}-p${index}`} className="mb-4 last:mb-0">
+                {paragraph}
+              </p>
+            ))}
+          </section>
+        );
+      })}
     </article>
   );
 }

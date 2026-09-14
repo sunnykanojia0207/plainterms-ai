@@ -11,7 +11,8 @@ interface UploadZoneProps {
   readonly compact?: boolean;
 }
 
-const ACCEPT_ATTR = ".pdf,.docx,.txt,application/pdf";
+const ACCEPT_ATTR =
+  ".pdf,.docx,.txt,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document";
 
 /**
  * Presentational upload dropzone: drag-and-drop + browse, visual drag state,
@@ -34,6 +35,7 @@ export function UploadZone({ onFilesSelected, compact = false }: UploadZoneProps
   return (
     <div
       aria-label="Upload a document. Accepts PDF, DOCX, and TXT."
+      aria-describedby="upload-hint"
       role="group"
       onDragOver={(event) => {
         event.preventDefault();
@@ -44,7 +46,7 @@ export function UploadZone({ onFilesSelected, compact = false }: UploadZoneProps
       className={cn(
         "flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-dashed text-center transition-colors",
         compact ? "px-4 py-6" : "px-6 py-10",
-        dragging ? "border-accent bg-accent/5" : "border-border bg-surface",
+        dragging ? "border-accent bg-accent-muted ring-2 ring-accent" : "border-border bg-surface",
       )}
     >
       <p className="text-base font-medium" aria-live="polite">
@@ -53,8 +55,10 @@ export function UploadZone({ onFilesSelected, compact = false }: UploadZoneProps
       <Button variant="secondary" size="sm" onClick={() => inputRef.current?.click()}>
         Browse files
       </Button>
-      <p className="text-sm text-text-secondary">PDF, DOCX, or TXT · up to 25 MB</p>
-      <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-text-secondary">
+      <p id="upload-hint" className="text-sm text-secondary">
+        PDF, DOCX, or TXT · up to 25 MB
+      </p>
+      <p className="mt-1 inline-flex items-center gap-1.5 text-xs text-secondary">
         <LockGlyph />
         Private to you · Used only for your review · Delete anytime
       </p>

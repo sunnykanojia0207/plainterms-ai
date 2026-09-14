@@ -19,7 +19,7 @@ export function DocumentOutline({
 }: DocumentOutlineProps) {
   return (
     <nav aria-label={label} className="flex flex-col gap-0.5">
-      <h2 className="px-2 pb-2 text-sm font-semibold tracking-wide text-text-secondary uppercase">
+      <h2 className="px-2 pb-2 text-sm font-semibold tracking-wide text-secondary uppercase">
         Sections
       </h2>
       <ol className="flex flex-col gap-0.5">
@@ -34,8 +34,8 @@ export function DocumentOutline({
                 className={cn(
                   "flex w-full items-baseline gap-2 rounded-md px-2 py-1.5 text-left text-sm transition-colors",
                   active
-                    ? "bg-accent/10 font-medium text-accent"
-                    : "text-text-secondary hover:bg-neutral-bg hover:text-text-primary",
+                    ? "bg-accent-muted font-medium text-accent"
+                    : "text-secondary hover:bg-surface-muted hover:text-primary",
                 )}
               >
                 <span

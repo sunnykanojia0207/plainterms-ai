@@ -6,13 +6,13 @@ import { cn } from "@/lib/utils/cn";
 type Tone = "neutral" | "accent" | "ai" | "success" | "warning" | "concern" | "critical";
 
 const TONE_CLASSES: Record<Tone, string> = {
-  neutral: "bg-neutral-bg text-text-secondary",
-  accent: "bg-accent/10 text-accent",
-  ai: "bg-ai-bg text-ai",
-  success: "bg-success-bg text-success",
-  warning: "bg-warning-bg text-warning",
-  concern: "bg-concern-bg text-concern",
-  critical: "bg-critical-bg text-critical",
+  neutral: "bg-surface-muted text-secondary",
+  accent: "bg-accent-muted text-accent",
+  ai: "bg-ai-muted text-ai-accent",
+  success: "bg-success-muted text-success",
+  warning: "bg-warning-muted text-warning",
+  concern: "bg-concern-muted text-concern",
+  critical: "bg-critical-muted text-critical",
 };
 
 const SEVERITY_TONE: Record<SeverityLevel, Tone> = {
@@ -72,7 +72,7 @@ function Dot({ tone }: { readonly tone: Tone }) {
       aria-hidden="true"
       className={cn(
         "size-1.5 rounded-full",
-        tone === "neutral" && "bg-neutral",
+        tone === "neutral" && "bg-tertiary",
         tone === "accent" && "bg-accent",
         tone === "ai" && "bg-ai",
         tone === "success" && "bg-success",

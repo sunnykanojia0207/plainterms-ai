@@ -3,7 +3,10 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
+import { AIInsight } from "@/components/documents/AIInsight";
+import { EvidenceReference } from "@/components/documents/EvidenceReference";
 import { CONFIDENCE_META } from "@/lib/domain/vocabulary";
+import { cn } from "@/lib/utils/cn";
 import type { AIResponse } from "@/lib/domain/types";
 
 interface AnswerCardProps {
@@ -34,7 +37,10 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
   return (
     <article
       aria-label="Answer with evidence"
-      className="flex flex-col gap-4 rounded-lg border border-border bg-surface p-4 sm:p-5"
+      className={cn(
+        "flex flex-col gap-4 rounded-lg border border-border bg-surface p-4 sm:p-5",
+        nonSubstantive && "border-warning bg-warning-muted",
+      )}
     >
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone="ai">Gemini answer</Badge>
@@ -47,7 +53,7 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
           Answer
         </h3>
         {paragraphs(response.answer).map((paragraph, index) => (
-          <p key={`p-${index}`} className="mt-2 max-w-[65ch] text-[15px] leading-7">
+          <p key={`p-${index}`} className="mt-2 max-w-[65ch] text-[15px] leading-6">
             {paragraph}
           </p>
         ))}
@@ -56,7 +62,7 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
       {response.citations.length > 0 ? (
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-2">
-            <h4 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+            <h4 className="text-sm font-semibold tracking-wide text-secondary uppercase">
               Evidence · {response.citations.length}
             </h4>
             <Button
@@ -71,27 +77,23 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
           {showEvidence ? (
             <ul className="flex flex-col gap-2">
               {response.citations.map((citation) => (
-                <li
-                  key={citation.clauseId}
-                  className="rounded-md border border-border bg-bg px-3 py-2"
-                >
-                  <blockquote className="font-doc text-[15px]">
-                    “{citation.quote}”
-                    <footer className="font-evidence mt-1 text-xs text-text-secondary">
-                      {citation.location}
-                    </footer>
-                  </blockquote>
-                  <p className="mt-1.5">
-                    <a
-                      href={`/review/${citation.documentId}#viewer-${citation.sectionId}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-sm font-medium text-accent underline underline-offset-2"
-                    >
-                      Verify in document <span aria-hidden="true">↗</span>
-                      <span className="sr-only">(opens in a new tab)</span>
-                    </a>
-                  </p>
+                <li key={citation.clauseId}>
+                  <EvidenceReference
+                    variant="plain"
+                    quote={`“${citation.quote}”`}
+                    location={citation.location}
+                    action={
+                      <a
+                        href={`/review/${citation.documentId}#viewer-${citation.sectionId}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm font-medium text-accent underline underline-offset-2"
+                      >
+                        Verify in document <span aria-hidden="true">↗</span>
+                        <span className="sr-only">(opens in a new tab)</span>
+                      </a>
+                    }
+                  />
                 </li>
               ))}
             </ul>
@@ -101,7 +103,7 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
 
       {response.ambiguities.length > 0 ? (
         <div>
-          <h4 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+          <h4 className="text-sm font-semibold tracking-wide text-secondary uppercase">
             Uncertainty
           </h4>
           <ul className="mt-1 flex list-disc flex-col gap-1 pl-5 text-sm">
@@ -114,7 +116,7 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
 
       {response.gaps.length > 0 ? (
         <div>
-          <h4 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+          <h4 className="text-sm font-semibold tracking-wide text-secondary uppercase">
             What the document doesn&apos;t establish
           </h4>
           <ul className="mt-1 flex list-disc flex-col gap-1 pl-5 text-sm">
@@ -127,7 +129,7 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
 
       {response.followUps.length > 0 ? (
         <div>
-          <h4 className="text-sm font-semibold tracking-wide text-text-secondary uppercase">
+          <h4 className="text-sm font-semibold tracking-wide text-secondary uppercase">
             Question to consider
           </h4>
           <div className="mt-2 flex flex-wrap gap-2">
@@ -146,14 +148,13 @@ export function AnswerCard({ response, headingRef, onFollowUp }: AnswerCardProps
       ) : null}
 
       {response.counselQuestions.length > 0 ? (
-        <div className="rounded-md border border-ai/40 bg-ai-bg/40 px-3 py-2">
-          <h4 className="text-sm font-semibold">Questions for a legal professional</h4>
-          <ul className="mt-1 flex list-disc flex-col gap-1 pl-5 text-sm">
+        <AIInsight marker="Questions for a legal professional">
+          <ul className="flex list-disc flex-col gap-1 pl-5 text-sm">
             {response.counselQuestions.map((item) => (
               <li key={item}>{item}</li>
             ))}
           </ul>
-        </div>
+        </AIInsight>
       ) : null}
     </article>
   );

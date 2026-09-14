@@ -3,11 +3,12 @@
 import { useState } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
-import { Card } from "@/components/ui/Card";
 import { Tabs } from "@/components/ui/Tabs";
 import { Text } from "@/components/ui/Text";
 import { AISkeleton } from "@/components/ui/Skeleton";
 import { useToast } from "@/components/ui/Toast";
+import { Notice } from "@/components/ui/Notice";
+import { EvidenceReference } from "@/components/documents/EvidenceReference";
 import { useActionPack } from "@/components/documents/use-action-pack";
 import type { ActionPackItem, ActionPackItemKind } from "@/lib/domain/types";
 
@@ -92,7 +93,7 @@ export function ActionPackPanel({
 
   if (status === "idle") {
     return (
-      <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-bg px-4 py-5">
+      <div className="flex flex-col gap-2 rounded-lg border border-dashed border-border bg-background px-4 py-5">
         <p className="text-base font-medium">Prepare your Action Pack</p>
         <Text tone="secondary" className="text-sm">
           Turn this review into obligations, dates, review items, questions, and a before-signing
@@ -110,7 +111,7 @@ export function ActionPackPanel({
   if (status === "loading") {
     return (
       <div className="flex flex-col gap-3" role="status" aria-label="Preparing Action Pack">
-        <p className="text-sm text-text-secondary">Preparing your Action Pack…</p>
+        <p className="text-sm text-secondary">Preparing your Action Pack…</p>
         <AISkeleton />
         <div>
           <Button variant="secondary" size="sm" onClick={cancel}>
@@ -152,8 +153,11 @@ export function ActionPackPanel({
 
   return (
     <div className="flex flex-col gap-3">
+      <p className="font-evidence text-xs text-tertiary tabular-nums">
+        Prepared from {title} · v{version}
+      </p>
       <div className="flex items-center justify-between gap-2">
-        <p className="text-sm text-text-secondary">
+        <p className="text-sm text-secondary">
           PlainTerms prepared this checklist from the document.
         </p>
         <Button variant="tertiary" size="sm" onClick={start}>
@@ -261,7 +265,7 @@ export function ActionPackPanel({
                   }
                 />
                 {byKind("lawyer").length > 0 ? (
-                  <div className="rounded-md border border-ai/40 bg-ai-bg/40 px-3 py-2">
+                  <div className="rounded-md border border-ai-accent bg-ai-muted px-3 py-2">
                     <p className="text-sm font-semibold">
                       For discussion with a qualified legal professional
                     </p>
@@ -288,26 +292,26 @@ export function ActionPackPanel({
             label: `Checklist (${byKind("checklist").length + byKind("info-needed").length})`,
             content: (
               <div className="flex flex-col gap-4">
-                <ul className="flex flex-col gap-2">
+                <ul className="flex flex-col divide-y divide-border border-y border-border">
                   {byKind("checklist").map((item) => {
                     const done = checked.has(item.id);
                     return (
-                      <li
-                        key={item.id}
-                        className="flex items-start gap-2 rounded-md border border-border bg-surface px-3 py-2"
-                      >
+                      <li key={item.id} className="flex min-h-[44px] items-start gap-3 py-2">
                         <input
                           type="checkbox"
                           id={`pack-check-${item.id}`}
                           checked={done}
                           onChange={() => toggleCheck(item.id)}
-                          className="mt-1 size-4 accent-accent"
+                          className="mt-1 size-5 shrink-0 accent-accent"
                         />
                         <div className="flex min-w-0 flex-1 flex-col">
-                          <label htmlFor={`pack-check-${item.id}`} className="text-sm font-medium">
+                          <label
+                            htmlFor={`pack-check-${item.id}`}
+                            className={`text-sm font-medium ${done ? "line-through" : ""}`}
+                          >
                             {item.title}
                           </label>
-                          <span className="text-sm text-text-secondary">{item.summary}</span>
+                          <span className="text-sm text-secondary">{item.summary}</span>
                           {item.evidence !== null ? (
                             <button
                               type="button"
@@ -352,7 +356,7 @@ export function ActionPackPanel({
           Export PDF
         </Button>
       </div>
-      <p className="text-xs text-text-secondary">
+      <p className="text-xs text-secondary">
         Copy and print use this pack&apos;s content. PDF export arrives with the export backend.
       </p>
     </div>
@@ -371,17 +375,16 @@ function PackNotice({
   readonly onAction: () => void;
 }) {
   return (
-    <Card>
-      <p className="text-base font-medium">{title}</p>
-      <Text tone="secondary" className="mt-1 text-sm">
-        {detail}
-      </Text>
-      <div className="mt-3">
+    <Notice
+      title={title}
+      action={
         <Button variant="secondary" size="sm" onClick={onAction}>
           {actionLabel}
         </Button>
-      </div>
-    </Card>
+      }
+    >
+      {detail}
+    </Notice>
   );
 }
 
@@ -402,7 +405,7 @@ function ItemList({
     );
   }
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col divide-y divide-border border-y border-border">
       {items.map((item) => (
         <PackItemCard key={item.id} item={item} onJump={onJump(item)} />
       ))}
@@ -418,26 +421,25 @@ function PackItemCard({
   readonly onJump: (() => void) | null;
 }) {
   return (
-    <article className="rounded-lg border border-border bg-surface p-3">
+    <article className="py-3">
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone={PRIORITY_TONE[item.priority]}>{PRIORITY_LABEL[item.priority]}</Badge>
       </div>
       <h4 className="mt-2 text-[15px] font-semibold">{item.title}</h4>
       <p className="mt-1 text-sm">{item.summary}</p>
       {item.evidence !== null ? (
-        <blockquote className="font-doc mt-2 border-l-2 border-evidence-border bg-evidence/40 px-3 py-2 text-[15px]">
-          “{item.evidence.quote}”
-          <footer className="font-evidence mt-1 text-xs text-text-secondary">
-            {item.evidence.location}
-          </footer>
-        </blockquote>
+        <EvidenceReference
+          quote={`“${item.evidence.quote}”`}
+          location={item.evidence.location}
+          className="mt-2"
+        />
       ) : (
-        <p className="mt-2 text-sm text-text-secondary">
+        <p className="mt-2 text-sm text-secondary">
           Not stated in the document — confirm independently.
         </p>
       )}
       {item.uncertainty !== null ? (
-        <p className="mt-2 text-sm text-text-secondary">{item.uncertainty}</p>
+        <p className="mt-2 text-sm text-secondary">{item.uncertainty}</p>
       ) : null}
       {item.nextStep !== null ? (
         <p className="mt-1 text-sm">

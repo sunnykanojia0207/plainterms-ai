@@ -68,7 +68,7 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
               ]}
             />
           </div>
-          <p className="mt-2 text-sm text-text-secondary">
+          <p className="mt-2 text-sm text-secondary">
             {textSize === "large" ? "Large text is on for this session." : "Standard text size."}
           </p>
         </section>
@@ -88,21 +88,23 @@ export function SettingsSheet({ open, onClose }: SettingsSheetProps) {
               { value: "saved", label: RETENTION_COPY.saved },
             ]}
           />
-          <Button
-            variant="tertiary"
-            size="sm"
-            onClick={() => {
-              const removed = clearUserDocuments();
-              notify(
-                removed === 0
-                  ? "Nothing to delete — only sample documents remain."
-                  : `Deleted ${removed} uploaded ${removed === 1 ? "document" : "documents"}. Samples were kept.`,
-              );
-              onClose();
-            }}
-          >
-            Delete my documents
-          </Button>
+          <div className="mt-4 border-t border-border-subtle pt-4">
+            <Button
+              variant="tertiary"
+              size="sm"
+              onClick={() => {
+                const removed = clearUserDocuments();
+                notify(
+                  removed === 0
+                    ? "Nothing to delete — only sample documents remain."
+                    : `Deleted ${removed} uploaded ${removed === 1 ? "document" : "documents"}. Samples were kept.`,
+                );
+                onClose();
+              }}
+            >
+              Delete my documents
+            </Button>
+          </div>
           <Text tone="secondary" className="text-sm">
             Document content is never used for analytics and never appears in logs.
           </Text>

@@ -275,9 +275,9 @@ Trust is shown through **controls and restraint, not claims:**
 
 **System (no webfont dependency for MVP; platform-native stacks):**
 
-- **UI sans:** `-apple-system, "Segoe UI", Inter, Roboto…` — interface, AI output, metadata.
-- **Document serif (reading):** `Georgia, "Times New Roman", serif` for the viewer body — signals "this is the original text," distinct from our voice at a glance. Sans option in accessibility settings.
-- **Mono (evidence):** `ui-monospace, "SF Mono", Consolas…` — clause IDs, section refs, dates.
+- **UI sans:** `-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif` (per `app/globals.css` `--font-ui`; no webfont, no Inter) — interface, AI output, metadata.
+- **Document serif (reading):** `Georgia, "Times New Roman", Times, serif` (per `--font-doc`) for the viewer body — signals "this is the original text," distinct from our voice at a glance. Sans option in accessibility settings.
+- **Mono (evidence):** `ui-monospace, "SF Mono", SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace` (per `--font-evidence`) — clause IDs, section refs, dates.
 
 **Scale (desktop, 16px base):** Display 28/36 · H1 22/30 · H2 18/26 · Body 16/26 · AI body 15/24 · Clause/quote 17/28 (never smaller than body) · Metadata 13/20 · Micro-labels 12/16 uppercase-tracked (sparingly).
 
@@ -287,29 +287,37 @@ Trust is shown through **controls and restraint, not claims:**
 
 ## 20. Color System
 
-Quiet, editorial, light-first. One accent. Severity always paired with icon + label.
+Quiet, editorial, light-first. One accent. Severity always paired with icon + label. Values below are quoted verbatim from `app/globals.css` (`:root` = light, `.dark` = dark). All product color MUST come from these tokens — no hex in components.
 
 | Token | Value (light) | Usage |
 |---|---|---|
-| `--bg` | #FAFAF8 (warm paper white) | App background |
+| `--background` | #FAF7F2 (warm paper) | App background |
 | `--surface` | #FFFFFF | Cards, panels |
-| `--surface-elevated` | #FFFFFF + shadow sm | Drawers, dialogs, sheets |
+| `--surface-raised` | #FFFFFF | Drawers, dialogs, sheets (elevation via shadow, not color) |
+| `--surface-muted` | #F1EEE6 | Muted wells, inset regions |
+| `--border` | #E3DED2 (warm gray) | Dividers, card borders |
+| `--border-subtle` | #ECE8DD | Hairlines inside cards/sections |
 | `--text-primary` | #1A1C1E | Headings, body |
-| `--text-secondary` | #5B6068 | Metadata, hints |
-| `--border` | #E5E3DD (warm gray) | Dividers, card borders |
-| `--accent` | #1D4ED8-ish restrained blue (tuned for AA on white) | Primary actions, active states, links |
-| `--ai` | #6D28D9-ish restrained violet (AA) + spark glyph | AI marker ONLY — never for actions or document text |
-| `--success` | #166534 (deep green) | Completed checks, healthy states |
-| `--warning` | #92400E (deep amber) | Worth reviewing |
-| `--concern` | #B45309 → paired with ⚠ + label | Potential concern (amber family, not alarm) |
-| `--critical` | #B91C1C → paired with ⛔/● + label | Highest severity, used sparingly |
-| `--neutral` | #6B7280 | Unchanged, inactive, silent states |
-| `--added` | deep green bg tint + "+" + label | Comparison additions |
-| `--removed` | deep red bg tint + "−" + label | Removals |
-| `--changed` | deep amber bg tint + "≠/●" + label | Modifications |
-| `--evidence` | accent-tinted highlight (#DBEAFE-ish) + gutter mark | Source spans, citation targets |
+| `--text-secondary` | #5B5750 | Metadata, hints |
+| `--text-tertiary` | #6F6A5E | Faint captions, placeholders |
+| `--accent` | #2F4BC2 (tuned for AA on paper) | Primary actions, active states, links |
+| `--accent-hover` | #243B9E | Accent hover/pressed |
+| `--accent-muted` | #E8EDFB | Accent wash backgrounds |
+| `--ai-accent` | #6D28D9 (restrained violet, AA) + spark glyph | AI marker ONLY — never for actions or document text |
+| `--ai-muted` | #F1EAFD | AI-block wash (`AIInsight`, example insight) |
+| `--success` / `--success-muted` | #166534 / #E7F2E9 | Completed checks, healthy states |
+| `--warning` / `--warning-muted` | #7C4A0A / #FBF0D9 | Worth reviewing |
+| `--concern` / `--concern-muted` | #92400E / #FBEEDC, paired with ⚠ + label | Potential concern (amber family, not alarm) |
+| `--critical` / `--critical-muted` | #B42318 / #FBE7E4, paired with ⛔/● + label | Highest severity, used sparingly |
+| `--evidence` | #E2EAFB | Source-span wash, citation targets |
+| `--evidence-border` | #9AB4E6 | Evidence well border (`EvidenceReference`) |
+| `--selection` | #D9E6FC | Text selection |
+| `--focus` | #2F4BC2 | Visible focus outline |
+| `--overlay` | rgba(26, 28, 30, 0.5) | Scrim behind dialogs/drawers |
 
-Dark theme: deferred past MVP except `prefers-color-scheme` fallback for the viewer; tokens are theme-able by construction (all color via tokens, no hex in components).
+Dark theme (`.dark` in `app/globals.css`, not deferred): `--background` #16181D · `--surface` #1E2128 · `--surface-raised` #262C36 · `--surface-muted` #232833 · `--border` #333A47 · `--border-subtle` #272D39 · `--text-primary` #F2EEE6 · `--text-secondary` #B9B4A8 · `--text-tertiary` #98938A · `--accent` #9DB4FA · `--accent-hover` #B4C6FC · `--accent-muted` #26304F · `--ai-accent` #C9B5F5 · `--ai-muted` #2B2540 · `--success` #86D598 / muted #1A3324 · `--warning` #E5B85C / muted #38300F · `--concern` #E8A45C / muted #38290F · `--critical` #F0968E / muted #3E1C1B · `--evidence` #22344F · `--evidence-border` #4A6FA0 · `--selection` #2C3D61 · `--focus` #9DB4FA · `--overlay` rgba(0, 0, 0, 0.6).
+
+Renamed/removed vs the prior table: `--bg` → `--background`; `--surface-elevated` → `--surface-raised`; `--ai`/`--ai-bg` → `--ai-accent`/`--ai-muted`; `--success-bg`/`--warning-bg`/`--concern-bg`/`--critical-bg` → `--*-muted`; `--neutral`/`--neutral-bg` and `--added`/`--removed`/`--changed` pairs removed (comparison direction is carried by labeled materiality tags + `EvidenceReference variant="plain"` panes, never color alone); `--evidence` re-tinted #DBEAFE-ish → #E2EAFB. New tokens: `--surface-muted`, `--border-subtle`, `--text-tertiary`, `--accent-muted`, `--selection`, `--focus`, `--overlay`.
 
 ---
 
@@ -321,8 +329,8 @@ Single visual language; every component ships with default / hover / focus-visib
 - **Input / Search / Dropdown:** 1px border, radius md, visible focus ring (2px accent offset); in-document search shows match count + prev/next.
 - **Tabs:** underline style for panel tabs (Review panel, Ask scope); segmented control for view toggles (page/continuous, v1/v2).
 - **Badge:** type badges (Service Agreement/NDA/SOW), version pills, severity tags (icon + word), confidence tags (High/Medium/Low + reason on tap).
-- **Card (base):** surface, 1px border, radius lg, no heavy shadow; generous padding.
-- **AI Card:** base card + violet left rule (3px) + Gemini marker header + structured anatomy (§9).
+- **Card (base):** `Surface` primitive — surface, 1px `var(--border)`, radius lg, border-flat (no shadow); generous padding. Shadows sm/md are reserved for elevated sheets and dialogs, never cards.
+- **AI Card (`AIInsight`):** `Surface` + 3px `var(--ai-accent)` left rule (`border-l-[3px] border-l-ai-accent`) on a `var(--ai-muted)` wash + uppercase marker header in `var(--ai-accent)` + structured anatomy (§9). Counsel content stays visually quarantined in its own bordered counsel style (person icon) — never mixed into AI or document-fact styling.
 - **Clause Card:** base card + importance rank + severity tag + progressive disclosure (§10).
 - **Evidence Card:** quote-styled body + clause-ID mono ref + dual jump buttons (viewer location).
 - **Comparison Card:** the semantic redline anatomy (§12) + dual v1/v2 jump links + materiality/direction tags.
@@ -348,7 +356,7 @@ WCAG 2.2 AA target, designed in (not audited after):
 
 - **Keyboard:** full operability with visible focus (2px accent ring, never removed); roving tabindex in section nav and change lists; shortcuts for search (`/`), citation jump (`]`/`[`), panel toggle; focus trapped in dialogs, restored on close; focus moved deliberately on viewer jumps with screen-reader announcement of the new location.
 - **Screen readers:** landmarked regions; viewer exposes tagged reading order and text alternatives for highlights ("Flagged: potential concern, non-compete, section 11"); AI streaming announced via polite live regions (final text, not every token); comparison changes exposed as a list with semantic added/removed/changed roles; confidence and severity always text, never icon-only.
-- **Vision:** AA contrast everywhere (accent and AI violet tuned for white); severity never color-alone; text resizing to 200% without loss; dyslexia-friendly reading options (§19 + spacing controls).
+- **Vision:** AA contrast by token pair — `--text-primary` #1A1C1E on `--background` #FAF7F2, `--text-secondary` #5B5750 on paper, `--accent` #2F4BC2 and `--ai-accent` #6D28D9 on white/paper washes, severity pairs (`--success` #166534, `--warning` #7C4A0A, `--concern` #92400E, `--critical` #B42318 on their `--*-muted` washes); dark-theme pairs per §20 (e.g. `--accent` #9DB4FA, `--ai-accent` #C9B5F5 on dark surfaces); severity never color-alone; text resizing to 200% without loss; dyslexia-friendly reading options (§19 + spacing controls).
 - **Motion/touch:** reduced-motion support (§22); touch targets ≥44×44px; no hover-dependent meaning.
 
 ---
@@ -368,30 +376,44 @@ WCAG 2.2 AA target, designed in (not audited after):
 ## 25. Design Tokens
 
 ```text
-COLOR      §20 table (bg, surface, elevated, text-1/2, border, accent, ai,
-           success, warning, concern, critical, neutral, added, removed,
-           changed, evidence) — all theme-able, AA-verified pairs documented.
+COLOR      §20 table (--background, --surface, --surface-raised,
+           --surface-muted, --border, --border-subtle, --text-primary,
+           --text-secondary, --text-tertiary, --accent, --accent-hover,
+           --accent-muted, --ai-accent, --ai-muted, --success/-muted,
+           --warning/-muted, --concern/-muted, --critical/-muted,
+           --evidence, --evidence-border, --selection, --focus, --overlay)
+           + full .dark values — all theme-able, AA-verified pairs documented.
 
-TYPE       font-ui / font-doc / font-mono stacks · scale 12→28 (§19) ·
-           weights 400/500/600/700 · line-heights 16→36 · tracking +0.04em micro only.
+TYPE       --font-ui (system stack, no Inter) / --font-doc (Georgia serif) /
+           --font-evidence (system mono) · scale display 34/40 (2.125rem/2.5rem),
+           h2 + page-title 22/30 (1.375rem/1.875rem), section-title 18/26
+           (1.125rem/1.625rem) (§19) · weights 400/500/600/700 ·
+           line-heights per scale · tracking uppercase micro only.
 
 SPACE      4pt base: xs 4 · sm 8 · md 16 · lg 24 · xl 32 · 2xl 48 · 3xl 64.
            Panel gutters lg; viewer measure capped 75ch; card padding md–lg.
+           Shell max width 1400px (`max-w-[1400px]` in RootLayout).
 
-RADII      sm 6 · md 10 · lg 14 · pill 999. Cards lg; chips pill; inputs md.
+RADII      sm 6px · md 12px · lg 22px (per :root). Cards lg; inputs md;
+           AI blocks md (`AIInsight` uses rounded-md).
 
 BORDERS    1px var(--border) default · 2px for counsel-quarantine and silence
-           cards (dashed for silence) · 3px left-rule for AI cards.
+           cards (dashed for silence) · 3px left-rule for AI cards
+           (border-l-ai-accent).
 
-SHADOWS    sm (elevated sheets) · md (dialogs) only. Cards are border-flat.
+SHADOWS    sm (elevated sheets) · md (dialogs) only. Cards are border-flat
+           (`Surface`: no shadow; hierarchy from borders).
 
-MOTION     durations 120/250/300ms · ease-out entrances (§22) · reduced-motion
-           collapse map.
+MOTION     durations micro 120ms / standard 220ms / reading-scroll 300ms
+           (--duration-micro/standard/reading; --transition-duration-*
+           aliases) · ease-out entrances (§22) · reduced-motion
+           collapse map. Panel/drawer slide ~200–220ms.
 
 Z-INDEX    viewer-highlights 1 · sticky toolbar 10 · drawer/sheet 40 ·
            dialog 50 · toast 60 · tooltip 70.
 
-FOCUS      2px accent ring + 2px offset, always visible, never suppressed.
+FOCUS      2px solid var(--focus) + 2px offset, always visible, never
+           suppressed (+ forced-colors Highlight fallback).
 
 STATES     Every interactive token defines default/hover/focus/active/disabled/
            loading/error. Severity and evidence states always pair color with

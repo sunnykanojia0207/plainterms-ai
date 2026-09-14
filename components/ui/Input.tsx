@@ -30,14 +30,14 @@ export function Input({ label, error, hint, id, className, ...rest }: InputProps
         aria-describedby={describedBy}
         className={cn(
           "h-11 rounded-md border border-border bg-surface px-3 text-base",
-          "placeholder:text-text-secondary",
+          "placeholder:text-secondary",
           error !== undefined && "border-critical",
           className,
         )}
         {...rest}
       />
       {hint === undefined || error !== undefined ? null : (
-        <p id={hintId} className="text-sm text-text-secondary">
+        <p id={hintId} className="text-sm text-secondary">
           {hint}
         </p>
       )}

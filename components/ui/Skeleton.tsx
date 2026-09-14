@@ -3,7 +3,10 @@ import { cn } from "@/lib/utils/cn";
 /** Base shimmer block. Shape comes from the caller's layout classes. */
 export function Skeleton({ className }: { readonly className?: string }) {
   return (
-    <div aria-hidden="true" className={cn("animate-pulse rounded-md bg-neutral-bg", className)} />
+    <div
+      aria-hidden="true"
+      className={cn("animate-pulse rounded-md bg-surface-muted", className)}
+    />
   );
 }
 

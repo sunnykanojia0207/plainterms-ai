@@ -72,7 +72,7 @@ export function Drawer({
 
   return (
     <div
-      className="fixed inset-0 z-40 bg-black/40"
+      className="fixed inset-0 z-40 bg-overlay"
       onMouseDown={(event) => {
         if (event.target === event.currentTarget) {
           onClose();
@@ -87,7 +87,7 @@ export function Drawer({
         aria-describedby={description === undefined ? undefined : descriptionId}
         tabIndex={-1}
         className={cn(
-          "absolute flex flex-col overflow-y-auto bg-surface-elevated p-6 shadow-md",
+          "absolute flex flex-col overflow-y-auto bg-surface-raised p-6 shadow-md",
           SIDE_CLASSES[side],
           className,
         )}
@@ -96,7 +96,7 @@ export function Drawer({
           {title}
         </h2>
         {description === undefined ? null : (
-          <p id={descriptionId} className="mt-1 text-sm text-text-secondary">
+          <p id={descriptionId} className="mt-1 text-sm text-secondary">
             {description}
           </p>
         )}

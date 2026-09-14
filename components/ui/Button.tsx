@@ -5,9 +5,10 @@ type Variant = "primary" | "secondary" | "tertiary" | "destructive";
 type Size = "sm" | "md" | "lg";
 
 const VARIANT_CLASSES: Record<Variant, string> = {
-  primary: "bg-accent text-white hover:bg-accent-hover disabled:bg-neutral disabled:text-white",
-  secondary: "border border-border bg-surface text-text-primary hover:border-text-secondary",
-  tertiary: "text-accent hover:bg-accent/10",
+  primary:
+    "bg-accent text-white hover:bg-accent-hover disabled:bg-surface-muted disabled:text-white",
+  secondary: "border border-border bg-surface text-primary hover:border-secondary",
+  tertiary: "text-accent hover:bg-accent-muted",
   destructive: "bg-critical text-white hover:brightness-110",
 };
 
@@ -45,8 +46,8 @@ function isLink(props: PlainButtonProps): props is LinkButtonProps {
 export function Button(props: PlainButtonProps) {
   const { variant = "primary", size = "md", className, children } = props;
   const classes = cn(
-    "inline-flex items-center justify-center gap-2 rounded-md font-medium",
-    "transition-colors disabled:cursor-not-allowed disabled:opacity-60",
+    "inline-flex items-center justify-center gap-2 rounded-md font-semibold",
+    "transition-colors duration-micro active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-60",
     "min-h-[44px] sm:min-h-0",
     VARIANT_CLASSES[variant],
     SIZE_CLASSES[size],

@@ -79,7 +79,7 @@ export function Tabs({ items, defaultTab, label }: TabsProps) {
                 "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors",
                 selected
                   ? "border-accent text-accent"
-                  : "border-transparent text-text-secondary hover:text-text-primary",
+                  : "border-transparent text-secondary hover:text-primary",
               )}
             >
               {item.label}
