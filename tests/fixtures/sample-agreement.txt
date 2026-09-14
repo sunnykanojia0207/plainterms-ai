@@ -1,0 +1,15 @@
+Test Services Agreement
+
+1. Parties and Purpose
+
+This Test Services Agreement (ZXQ-TEST-7741) is between Acme Client LLC and Test Contractor.
+The Client engages the Contractor for test design services described here.
+
+2. Payment Terms
+
+The Client will pay a fixed test fee of $9,999 per month, invoiced monthly.
+Invoices are payable net seven (7) days from receipt under this test agreement.
+
+3. Termination
+
+Either party may terminate this test agreement with five (5) days written notice.

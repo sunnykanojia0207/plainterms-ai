@@ -1,0 +1,10 @@
+.next
+node_modules
+out
+coverage
+test-results
+playwright-report
+.opencode
+LEGAL_GENAI_PRODUCT_BLUEPRINT.md
+PLAINTERMS_UI_UX_SPECIFICATION.md
+PLAINTERMS_SCREEN_UX_BLUEPRINT.md
