@@ -57,11 +57,11 @@ non-compete 6→12 months, removed late-fee language) → Action Pack →
 Review Guide. With `GEMINI_API_KEY` set, every step is live; without it,
 document flows still run and AI surfaces explain themselves honestly.
 
-![Home](docs/screenshots/01-home.png)
-![Review](docs/screenshots/02-review.png)
-![Compare](docs/screenshots/03-compare.png)
-![Ask](docs/screenshots/04-ask.png)
-![Documents](docs/screenshots/05-documents.png)
+![Home](docs/screenshots/v2-home-1440x900.png)
+![Review](docs/screenshots/v2-review-1440x900.png)
+![Compare](docs/screenshots/v2-compare-1440x900.png)
+![Ask](docs/screenshots/v2-ask-1440x900.png)
+![Documents](docs/screenshots/v2-documents-1440x900.png)
 
 ## Safety
 
