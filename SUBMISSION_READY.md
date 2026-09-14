@@ -5,7 +5,7 @@
 
 ## Links
 
-- Repository URL: PENDING (local release commit ready; push needs a remote)
+- Repository URL: https://github.com/sunnykanojia0207/plainterms-ai (pushed 2026-09-14, branch `main`)
 - Vercel URL: PENDING (not deployed; assessment in ARCHITECTURE.md)
 - Branch: `main` (only branch)
 
@@ -79,18 +79,18 @@ Single branch `main`, one root release commit, working tree clean.
 
 Submission README complete: problem, solution, user, GenAI role,
 features, demo flow, safety, architecture, documents, setup, testing,
-limitations, live-demo/GitHub placeholders, 5 screenshots.
+limitations, live-demo/GitHub placeholders, 11 v2 screenshots (fresh set).
 
 ## Final submission checklist
 
 - [x] Complete project code on one branch, working tree clean
 - [x] Repository ~0.71 MB (< 10 MB), no junk tracked
-- [x] README submission-complete with screenshots
+- [x] README submission-complete with screenshots (11 v2 files in docs/screenshots)
 - [x] Setup, architecture, security, accessibility, testing documented
 - [x] No secrets committed (scanned)
 - [x] All quality gates green at release commit
 - [x] Demo path works keyless (seeded V1/V2); AI live with key
-- [ ] Push to public GitHub remote (needs remote URL — see below)
+- [x] Push to public GitHub remote (done 2026-09-14: sunnykanojia0207/plainterms-ai, branch `main`)
 - [ ] Vercel production deploy + smoke test (needs Vercel auth)
 - [ ] Live-model verification (needs key)
 

@@ -173,9 +173,11 @@ command menu, drawers, dialogs, pagination, jumps, follow-ups, history.
 - [x] Live demo configured (`npm run dev`; seeded V1/V2 work keyless)
 - [x] No secrets committed (verified by search)
 - [x] Demo path documented (DEVELOPMENT.md + report §1/§3 flows)
-- [ ] Public GitHub repository — **PENDING (owner action):** `git init`,
-      first commit (verify no `.env.local`), single branch, push; confirm
-      size (node_modules/`.next` ignored; fixtures are kilobytes)
+- [x] Public GitHub repository — DONE 2026-09-14:
+      https://github.com/sunnykanojia0207/plainterms-ai (`main`: MVP release
+      + redesign + error-state hardening; legacy screenshots replaced by the
+      11-file v2 set). Size to re-verify post-push; node_modules/`.next`
+      ignored; fixtures are kilobytes.
 
 ---
 
