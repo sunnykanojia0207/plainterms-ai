@@ -61,6 +61,7 @@ document flows still run and AI surfaces explain themselves honestly.
 ![Review](docs/screenshots/v2-review-1440x900.png)
 ![Compare](docs/screenshots/v2-compare-1440x900.png)
 ![Ask](docs/screenshots/v2-ask-1440x900.png)
+![Ask (live Gemini answer with evidence)](docs/screenshots/v2-ask-live-1440x900.png)
 ![Documents](docs/screenshots/v2-documents-1440x900.png)
 
 ## Safety
