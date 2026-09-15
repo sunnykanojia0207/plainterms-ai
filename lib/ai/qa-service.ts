@@ -4,7 +4,8 @@
  */
 import "server-only";
 import { answerQuestion, type QARequest } from "@/lib/ai/qa";
-import { contentFromFixture } from "@/lib/ai/content";
+import type { DocumentContent } from "@/lib/ai/content";
+import { resolveDocumentContent } from "@/lib/ai/document-content";
 import { normalizeText } from "@/lib/ai/evidence";
 import type { AIResponse, EvidenceReference } from "@/lib/domain/types";
 import type { AnswerEvidenceAI } from "@/lib/ai/qa-schemas";
@@ -39,19 +40,21 @@ function toCitation(
 /**
  * Attributes each citation to the document whose text actually contains
  * the quote. Section ids are shared across fixture versions, so only
- * quote matching identifies the true source.
+ * quote matching identifies the true source. Content resolves through the
+ * canonical records-first resolver, so fixture-backed and record-backed
+ * (uploaded) documents behave identically; unknown documents throw
+ * UnknownDocumentError, which the routes map to the safe 404 path.
  */
 function ownerOf(
   evidence: AnswerEvidenceAI,
-  documents: QARequest["documents"],
+  contents: ReadonlyMap<string, DocumentContent>,
   fallbackId: string,
 ): string {
   const quote = normalizeText(evidence.quote);
-  for (const doc of documents) {
-    const content = contentFromFixture(doc.documentId, doc.title, doc.fixtureId);
+  for (const [documentId, content] of contents) {
     const found = content.sections.some((section) => normalizeText(section.text).includes(quote));
     if (found) {
-      return doc.documentId;
+      return documentId;
     }
   }
   return fallbackId;
@@ -67,8 +70,12 @@ export class PlainTermsQAService {
     });
     const answer = result.answer;
     const fallbackId = input.documents[0]?.documentId ?? "unknown";
+    const contents = new Map<string, DocumentContent>();
+    for (const doc of input.documents) {
+      contents.set(doc.documentId, resolveDocumentContent(doc));
+    }
     const citations = answer.evidence.map((evidence, index) =>
-      toCitation(evidence, ownerOf(evidence, input.documents, fallbackId), index),
+      toCitation(evidence, ownerOf(evidence, contents, fallbackId), index),
     );
     const response: AIResponse = {
       answer: answer.answer,

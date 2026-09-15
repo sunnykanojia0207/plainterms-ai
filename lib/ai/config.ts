@@ -9,7 +9,26 @@ export const AI_CONFIG = {
   model: "gemini-2.5-flash",
   /** Low temperature: extraction and explanation must stay faithful. */
   temperature: 0.2,
-  maxOutputTokens: 4096,
+  /**
+   * Output-token budget for one model call. Live-observed 2026-09-15 against
+   * gemini-2.5-flash: the model's thinking tokens (~2800) share this budget
+   * with visible output, so 4096 truncated full document-analysis JSON
+   * mid-string (FINISH=MAX_TOKENS) and failed schema validation. A complete
+   * analysis needs ~1600 prompt + ~2800 thinking + ~3500 visible tokens, so
+   * 8192 (the provider default, far below the 65536 model cap) fits the
+   * worst-case structured workloads with headroom but no unbounded spend.
+   */
+  maxOutputTokens: 8192,
+  /**
+   * Thinking-token cap for one model call. Live-observed 2026-09-15 against
+   * gemini-2.5-flash: thinking shares maxOutputTokens with visible output
+   * and varies wildly per call (~2800, then ~5000), so no fixed output
+   * budget alone prevents truncation. Capping thinking at 1024 reserves the
+   * bulk of the budget for visible structured JSON while keeping light
+   * reasoning for extraction; unbounded thinking is pure cost with no
+   * quality benefit for these schema-constrained tasks.
+   */
+  thinkingBudget: 1024,
   /** Bounds end-to-end latency for one model call. */
   requestTimeoutMs: 45000,
   /** Transient-failure retries (initial attempt + this many retries). */

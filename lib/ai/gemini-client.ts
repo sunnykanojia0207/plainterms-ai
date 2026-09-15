@@ -107,6 +107,7 @@ export async function generateStructured<T>(
             systemInstruction,
             temperature: AI_CONFIG.temperature,
             maxOutputTokens: AI_CONFIG.maxOutputTokens,
+            thinkingConfig: { thinkingBudget: AI_CONFIG.thinkingBudget },
             responseMimeType: "application/json",
             responseJsonSchema: request.responseSchema,
           },

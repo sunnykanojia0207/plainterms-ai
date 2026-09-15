@@ -5,6 +5,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { z } from "zod";
 import { generateStructured, type StructuredRequest } from "@/lib/ai/gemini-client";
+import { AI_CONFIG } from "@/lib/ai/config";
 import { AITimeoutError, AITransientError, AIValidationError } from "@/lib/ai/errors";
 
 const { mockGenerate } = vi.hoisted(() => ({ mockGenerate: vi.fn() }));
@@ -78,5 +79,23 @@ describe("provider failure simulation", () => {
     const pending = generateStructured(request());
     await expect(pending).rejects.toBeInstanceOf(AIValidationError);
     expect(mockGenerate).toHaveBeenCalledTimes(2);
+  });
+
+  it("propagates the centralized model budget to the provider call", async () => {
+    vi.useRealTimers();
+    mockGenerate.mockResolvedValue({ text: JSON.stringify({ ok: true }) });
+    await generateStructured(request());
+    const call = mockGenerate.mock.calls[0]?.[0] as {
+      model: string;
+      config: {
+        temperature: number;
+        maxOutputTokens: number;
+        thinkingConfig: { thinkingBudget: number };
+      };
+    };
+    expect(call.model).toBe(AI_CONFIG.model);
+    expect(call.config.temperature).toBe(AI_CONFIG.temperature);
+    expect(call.config.maxOutputTokens).toBe(AI_CONFIG.maxOutputTokens);
+    expect(call.config.thinkingConfig.thinkingBudget).toBe(AI_CONFIG.thinkingBudget);
   });
 });

@@ -6,6 +6,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { answerQuestion } from "@/lib/ai/qa";
 import { cacheClear } from "@/lib/ai/cache";
+import { UnknownDocumentError } from "@/lib/ai/document-content";
+import { clearRecords, saveRecord } from "@/lib/documents/records";
 import { AIUnavailableError, AIValidationError } from "@/lib/ai/errors";
 import { FIXTURE_V1_ID } from "@/lib/documents/fixture-v1";
 import { FIXTURE_ID } from "@/lib/documents/fixture";
@@ -182,5 +184,92 @@ describe("Q&A pipeline integration", () => {
     await expect(
       answerQuestion({ documents: [v1Doc()], question: "What are my payment terms?" }),
     ).rejects.toBeInstanceOf(AIUnavailableError);
+  });
+});
+
+describe("Q&A service with record-backed uploads", () => {
+  const UPLOAD_QUOTE =
+    "The Client will pay a fixed upload fee of $1,000 per month for testing services.";
+
+  beforeEach(() => {
+    mockGenerate.mockReset();
+    cacheClear();
+    clearRecords();
+    process.env.GEMINI_API_KEY = "test-key";
+  });
+
+  function saveUploadRecord() {
+    saveRecord({
+      id: "upload-1",
+      title: "Upload",
+      type: "service-agreement",
+      typeConfident: true,
+      pageCount: 1,
+      sections: [
+        {
+          id: "sec-payment",
+          documentId: "upload-1",
+          title: "2. Payment",
+          level: 1,
+          pageNumber: 1,
+          clauseIds: [],
+          paragraphs: ["An introductory sentence.", UPLOAD_QUOTE],
+        },
+      ],
+      warnings: [],
+      createdAt: Date.now(),
+      expiresAt: Date.now() + 3600000,
+    });
+  }
+
+  function uploadDoc() {
+    return {
+      documentId: "upload-1",
+      title: "Upload",
+      fixtureId: "upload",
+      version: 1,
+    };
+  }
+
+  it("attributes citations to the uploaded record instead of crashing", async () => {
+    saveUploadRecord();
+    mockGenerate.mockResolvedValue(
+      ok(
+        JSON.stringify({
+          ...factPayload(),
+          answer: "The upload fee is $1,000 per month.",
+          evidence: [
+            {
+              sectionId: "sec-payment",
+              sectionTitle: "2. Payment",
+              quote: UPLOAD_QUOTE,
+              pageNumber: 1,
+            },
+          ],
+        }),
+      ),
+    );
+    const { PlainTermsQAService } = await import("@/lib/ai/qa-service");
+    const { response } = await new PlainTermsQAService().ask({
+      documents: [uploadDoc()],
+      question: "What is the upload fee?",
+    });
+    expect(response.answer).toContain("$1,000");
+    expect(response.citations).toHaveLength(1);
+    expect(response.citations[0]?.documentId).toBe("upload-1");
+    expect(response.citations[0]?.quote).toBe(UPLOAD_QUOTE);
+  });
+
+  it("fails safely for unknown documents without a provider call", async () => {
+    const { PlainTermsQAService } = await import("@/lib/ai/qa-service");
+    await expect(
+      new PlainTermsQAService().ask({
+        documents: [
+          { documentId: "missing-doc", title: "Missing", fixtureId: "upload", version: 1 },
+        ],
+        question: "Anything?",
+      }),
+    ).rejects.toBeInstanceOf(UnknownDocumentError);
+    expect(mockGenerate).not.toHaveBeenCalled();
   });
 });
